@@ -1,0 +1,21 @@
+<!-- Sidebar -->
+<app-llantera-sidebar />
+
+<!-- Overlay para cerrar sidebar en pantallas chicas -->
+<div class="sidebar-overlay" (click)="closeSidebar()"></div>
+
+<!-- Main Content -->
+<div class="main-content transition-all flex flex-col overflow-hidden min-h-screen">
+
+    <!-- Header -->
+    <app-ll-header />
+
+    <!-- Router Outlet -->
+    <router-outlet />
+
+    <div class="grow"></div>
+
+    <!-- Footer -->
+    <app-footer />
+
+</div>

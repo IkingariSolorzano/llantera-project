@@ -1,0 +1,86 @@
+<div class="sidebar-area bg-white dark:bg-[#0c1427] fixed overflow-hidden z-[999] top-0 h-screen transition-all rounded-r-md">
+  <div class="logo bg-white dark:bg-[#0c1427] border-b border-gray-100 dark:border-[#172036] px-[25px] pt-[19px] pb-[15px] absolute z-[2] right-0 top-0 left-0">
+    <a routerLink="/" class="transition-none relative flex items-center">
+      <img src="images/llantera/ico-llantera-hd.png" alt="Llantera de Occidente" class="w-auto h-[4em] object-contain" />
+      <span class="font-bold text-black dark:text-white relative ltr:ml-[8px] rtl:mr-[8px] top-px text-md">Llantera de Occidente</span>
+    </a>
+    <button type="button" class="burger-menu inline-block absolute z-[3] top-[24px] ltr:right-[25px] rtl:left-[25px] transition-all hover:text-primary-500" (click)="closeSidebar()">
+      <i class="material-symbols-outlined">close</i>
+    </button>
+  </div>
+
+  <ng-scrollbar visibility="hover" class="!h-screen">
+    <div class="pt-[89px] px-[25px] pb-[20px]">
+      <span class="block relative font-medium uppercase text-gray-400 mb-[8px] text-xs">Administración</span>
+
+      <ul class="space-y-[6px]">
+        @if (isAdmin) {
+        <li>
+          <a routerLink="/dashboard/usuarios" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebar()"
+             class="sidemenu-link rounded-md flex items-center transition-all font-medium text-gray-500 dark:text-gray-400 py-[9px] px-[14px] hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#15203c]">
+            <i class="material-symbols-outlined ltr:mr-[7px] rtl:ml-[7px] !text-[22px]">group</i>
+            Usuarios
+          </a>
+        </li>
+        <li>
+          <a routerLink="/dashboard/usuarios/niveles-precio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebar()"
+             class="sidemenu-link rounded-md flex items-center transition-all font-medium text-gray-500 dark:text-gray-400 py-[9px] px-[14px] hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#15203c]">
+            <i class="material-symbols-outlined ltr:mr-[7px] rtl:ml-[7px] !text-[22px]">sell</i>
+            Niveles de Precio
+          </a>
+        </li>
+        <!-- Empresas desactivadas temporalmente
+        <li>
+          <a routerLink="/dashboard/empresas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+             class="sidemenu-link rounded-md flex items-center transition-all font-medium text-gray-500 dark:text-gray-400 py-[9px] px-[14px] hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#15203c]">
+            <i class="material-symbols-outlined ltr:mr-[7px] rtl:ml-[7px] !text-[22px]">apartment</i>
+            Empresas
+          </a>
+        </li>
+        -->
+        <li>
+          <a routerLink="/dashboard/llantas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebar()"
+             class="sidemenu-link rounded-md flex items-center transition-all font-medium text-gray-500 dark:text-gray-400 py-[9px] px-[14px] hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#15203c]">
+            <i class="material-symbols-outlined ltr:mr-[7px] rtl:ml-[7px] !text-[22px]">donut_large</i>
+            Llantas
+          </a>
+        </li>
+        <li>
+          <a routerLink="/dashboard/marcas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebar()"
+             class="sidemenu-link rounded-md flex items-center transition-all font-medium text-gray-500 dark:text-gray-400 py-[9px] px-[14px] hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#15203c]">
+            <i class="material-symbols-outlined ltr:mr-[7px] rtl:ml-[7px] !text-[22px]">factory</i>
+            Marcas
+          </a>
+        </li>
+        }
+        @if (isAdmin || isEmployee) {
+        <li>
+          <a routerLink="/dashboard/pedidos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebar()"
+             class="sidemenu-link rounded-md flex items-center transition-all font-medium text-gray-500 dark:text-gray-400 py-[9px] px-[14px] hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#15203c]">
+            <i class="material-symbols-outlined ltr:mr-[7px] rtl:ml-[7px] !text-[22px]">local_shipping</i>
+            Pedidos
+          </a>
+        </li>
+        <li>
+          <a routerLink="/dashboard/ventas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebar()"
+             class="sidemenu-link rounded-md flex items-center transition-all font-medium text-gray-500 dark:text-gray-400 py-[9px] px-[14px] hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#15203c]">
+            <i class="material-symbols-outlined ltr:mr-[7px] rtl:ml-[7px] !text-[22px]">point_of_sale</i>
+            Ventas
+          </a>
+        </li>
+        }
+        <!-- Solicitudes desactivadas temporalmente
+        @if (isAdmin || isEmployee) {
+        <li>
+          <a routerLink="/dashboard/solicitudes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+             class="sidemenu-link rounded-md flex items-center transition-all font-medium text-gray-500 dark:text-gray-400 py-[9px] px-[14px] hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#15203c]">
+            <i class="material-symbols-outlined ltr:mr-[7px] rtl:ml-[7px] !text-[22px]">support_agent</i>
+            Solicitudes
+          </a>
+        </li>
+        }
+        -->
+      </ul>
+    </div>
+  </ng-scrollbar>
+</div>

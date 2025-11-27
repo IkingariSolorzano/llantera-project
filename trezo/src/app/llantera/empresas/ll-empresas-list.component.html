@@ -1,0 +1,151 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    Empresas
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      <a routerLink="/dashboard" class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500">
+        <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2">
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      Empresas
+    </li>
+  </ol>
+</div>
+
+<div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+  <div class="trezo-card-header sm:flex items-center justify-between">
+    <div class="trezo-card-title">
+      <form class="relative sm:w-[265px]" (submit)="$event.preventDefault()">
+        <label class="leading-none absolute ltr:left-[13px] rtl:right-[13px] text-black dark:text-white mt-px top-1/2 -translate-y-1/2">
+          <i class="material-symbols-outlined !text-[20px]">
+            search
+          </i>
+        </label>
+        <input
+          type="text"
+          name="search"
+          placeholder="Buscar empresa..."
+          class="bg-gray-50 border border-gray-50 h-[36px] text-xs rounded-md w-full block text-black pt-[11px] pb-[12px] ltr:pl-[38px] rtl:pr-[38px] ltr:pr-[13px] ltr:md:pr-[16px] rtl:pl-[13px] rtl:md:pl-[16px] placeholder:text-gray-500 outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c] dark:placeholder:text-gray-400"
+          [ngModel]="searchTerm()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </form>
+    </div>
+    <div class="trezo-card-subtitle mt-[15px] sm:mt-0">
+      <a
+        routerLink="/dashboard/empresas/nueva"
+        class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white"
+      >
+        <span class="inline-block relative ltr:pl-[22px] rtl:pr-[22px]">
+          <i class="material-symbols-outlined !text-[22px] absolute ltr:-left-[4px] rtl:-right-[4px] top-1/2 -translate-y-1/2">
+            add
+          </i>
+          Nueva empresa
+        </span>
+      </a>
+    </div>
+  </div>
+
+  @if (totalEmpresas() > 0) {
+    <div class="mt-[18px] text-sm text-gray-500 dark:text-gray-400">
+      {{ totalEmpresas() }} resultado{{ totalEmpresas() === 1 ? '' : 's' }} encontrados
+    </div>
+  }
+</div>
+
+@if (loading()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="flex items-center gap-[12px] text-gray-500 dark:text-gray-400">
+      <span class="loading loading-spinner loading-md"></span>
+      Cargando empresas...
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="text-danger-500 font-medium mb-[12px]">
+      {{ error() }}
+    </div>
+    <button type="button" (click)="retry()" class="px-[14px] py-[6px] rounded-md border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition-all">
+      Reintentar
+    </button>
+  </div>
+} @else if (totalEmpresas() === 0) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px] text-center text-gray-500 dark:text-gray-400">
+    No se encontraron empresas con este criterio.
+  </div>
+} @else {
+  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-[25px] mb-[25px]">
+    @for (empresa of empresas(); track empresa.id) {
+      <div class="trezo-card bg-white dark:bg-[#0c1427] p-[20px] md:p-[25px] rounded-md">
+        <div class="trezo-card-content">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="block text-md font-semibold text-black dark:text-white">
+                {{ empresa.socialReason }}
+              </span>
+              <span class="block text-sm text-gray-500 dark:text-gray-400">
+                Clave: {{ empresa.keyName }}
+              </span>
+            </div>
+            <span class="inline-flex items-center rounded-full text-xs px-[10px] py-[3px] text-primary-500 bg-primary-50 dark:bg-[#15203c]">
+              ID #{{ empresa.id }}
+            </span>
+          </div>
+
+          <ul class="mt-[17px] space-y-[6px] text-sm">
+            <li>
+              <span class="text-black dark:text-white">RFC:</span>
+              {{ empresa.rfc || 'N/A' }}
+            </li>
+            <li>
+              <span class="text-black dark:text-white">Dirección:</span>
+              {{ empresa.address || 'Sin especificar' }}
+            </li>
+            <li>
+              <span class="text-black dark:text-white">Correos:</span>
+              {{ displayContactList(empresa.emails) }}
+            </li>
+            <li>
+              <span class="text-black dark:text-white">Teléfonos:</span>
+              {{ displayContactList(empresa.phones) }}
+            </li>
+          </ul>
+
+          <div class="flex items-center gap-[9px] mt-[15px]">
+            <button
+              type="button"
+              class="text-primary-500 leading-none hover:opacity-80 transition"
+              title="Ver detalle"
+              (click)="onViewEmpresa(empresa.id)"
+            >
+              <i class="material-symbols-outlined !text-md">visibility</i>
+            </button>
+            <button
+              type="button"
+              class="text-gray-500 dark:text-gray-400 leading-none hover:text-primary-500 transition"
+              title="Editar"
+              (click)="onEditEmpresa(empresa.id)"
+            >
+              <i class="material-symbols-outlined !text-md">edit</i>
+            </button>
+            <button
+              type="button"
+              class="text-danger-500 leading-none hover:opacity-80 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              title="Eliminar"
+              (click)="onDeleteEmpresa(empresa)"
+              [disabled]="deletingId() === empresa.id"
+            >
+              <i class="material-symbols-outlined !text-md">delete</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

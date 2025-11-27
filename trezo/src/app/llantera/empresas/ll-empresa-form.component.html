@@ -1,0 +1,284 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    {{ pageTitle() }}
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      <a routerLink="/dashboard" class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500">
+        <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2">
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      Empresas
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      {{ pageTitle() }}
+    </li>
+  </ol>
+</div>
+
+@if (loading()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md text-sm text-gray-500 dark:text-gray-400">
+    Cargando información de la empresa...
+  </div>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="grid lg:grid-cols-12 gap-[25px]">
+      <div class="lg:col-span-8">
+        <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+          <div class="trezo-card-content space-y-[20px]">
+            <div>
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Nombre</label>
+              <input
+                type="text"
+                formControlName="keyName"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="E. Talachería"
+              />
+              @if (isInvalid('keyName')) {
+                <small class="text-danger-500">Este campo es obligatorio.</small>
+              }
+            </div>
+
+            <div>
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Razón social</label>
+              <input
+                type="text"
+                formControlName="socialReason"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Razón social"
+              />
+              @if (isInvalid('socialReason')) {
+                <small class="text-danger-500">Este campo es obligatorio.</small>
+              }
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-[20px]">
+              <div>
+                <label class="mb-[10px] text-black dark:text-white font-medium block">RFC</label>
+                <input
+                  type="text"
+                  formControlName="rfc"
+                  (input)="onRfcInput($event)"
+                  class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                  placeholder="RFC"
+                  maxlength="13"
+                />
+                @if (isInvalid('rfc')) {
+                  <small class="text-danger-500">RFC inválido. Debe tener 12 o 13 caracteres con formato válido.</small>
+                }
+              </div>
+              <div>
+                <label class="mb-[10px] text-black dark:text-white font-medium block">Contacto principal</label>
+                <input
+                  type="text"
+                  class="h-[45px] mb-[8px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                  placeholder="Buscar por nombre o correo"
+                  [ngModel]="contactSearchTerm()"
+                  (ngModelChange)="onContactSearchChange($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+                <select
+                  formControlName="mainContactId"
+                  class="h-[55px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer transition-all focus:border-primary-500 text-black dark:text-white"
+                >
+                  <option value="">Sin asignar</option>
+                  @for (usuario of filteredContactUsers(); track usuario.id) {
+                    <option [value]="usuario.id">
+                      {{ usuario.firstName }} {{ usuario.firstLastName }} {{ usuario.secondLastName }} - {{ usuario.email }}
+                    </option>
+                  }
+                </select>
+                @if (contactLoading()) {
+                  <small class="text-gray-500">Cargando usuarios...</small>
+                } @else if (contactError()) {
+                  <small class="text-danger-500">{{ contactError() }}</small>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Dirección</label>
+              <textarea
+                formControlName="address"
+                class="rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] pt-[12px] pb-[12px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500 h-[110px] resize-none"
+                placeholder="Calle, colonia, ciudad"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+          <div class="trezo-card-content">
+            <h6 class="font-semibold text-black dark:text-white mb-[15px]">Correos de contacto</h6>
+            <div formArrayName="emails" class="space-y-[12px]">
+              @for (control of emails.controls; let i = $index; track i) {
+                <div class="flex items-center gap-[10px]">
+                  <input
+                    type="email"
+                    class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500 flex-1"
+                    [formControlName]="i"
+                    placeholder="correo@empresa.com"
+                  />
+                  <button
+                    type="button"
+                    class="inline-flex items-center justify-center w-[36px] h-[36px] rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 dark:border-[#172036] dark:text-gray-400 dark:hover:bg-[#15203c] disabled:opacity-50 disabled:cursor-not-allowed"
+                    (click)="removeEmail(i)"
+                    [disabled]="emails.length === 1"
+                  >
+                    <i class="material-symbols-outlined !text-lg">close</i>
+                  </button>
+                </div>
+                @if (isEmailInvalid(i)) {
+                  <small class="text-danger-500 block mt-[4px]">Ingresa un correo válido.</small>
+                }
+              }
+            </div>
+            <button
+              type="button"
+              class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white mt-[15px]"
+              (click)="addEmail()"
+            >
+              Agregar correo
+            </button>
+          </div>
+        </div>
+
+        <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+          <div class="trezo-card-content">
+            <h6 class="font-semibold text-black dark:text-white mb-[15px]">Teléfonos</h6>
+            <div formArrayName="phones" class="space-y-[12px]">
+              @for (control of phones.controls; let i = $index; track i) {
+                <div class="flex items-center gap-[10px]">
+                  <input
+                    type="text"
+                    class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500 flex-1"
+                    [formControlName]="i"
+                    placeholder="Teléfono (10 dígitos)"
+                    maxlength="10"
+                  />
+                  <button
+                    type="button"
+                    class="inline-flex items-center justify-center w-[36px] h-[36px] rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 dark:border-[#172036] dark:text-gray-400 dark:hover:bg-[#15203c] disabled:opacity-50 disabled:cursor-not-allowed"
+                    (click)="removePhone(i)"
+                    [disabled]="phones.length === 1"
+                  >
+                    <i class="material-symbols-outlined !text-lg">close</i>
+                  </button>
+                </div>
+                @if (isPhoneInvalid(i)) {
+                  <small class="text-danger-500 block mt-[4px]">El teléfono debe tener 10 dígitos.</small>
+                }
+              }
+            </div>
+            <button
+              type="button"
+              class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white mt-[15px]"
+              (click)="addPhone()"
+            >
+              Agregar teléfono
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-4">
+        <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md space-y-[12px] text-sm text-gray-500 dark:text-gray-400">
+          <p>
+            Completa la información principal de tus clientes corporativos.
+          </p>
+          @if (error()) {
+            <div class="text-danger-500">{{ error() }}</div>
+          }
+          @if (success()) {
+            <div class="text-success-500">{{ success() }}</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="trezo-card mb-[25px]">
+      <div class="trezo-card-content">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="font-medium inline-block transition-all rounded-md md:text-md ltr:mr-[19px] rtl:ml-[19px] py-[10px] md:py-[12px] px-[20px] md:px-[22px] bg-danger-500 text-white hover:bg-danger-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="saving()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="font-medium inline-flex items-center gap-[8px] transition-all rounded-md md:text-md py-[10px] md:py-[12px] px-[20px] md:px-[22px] bg-primary-500 text-white hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="saving()"
+        >
+          <span>{{ submitLabel() }}</span>
+          @if (saving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+          }
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div
+    class="add-new-popup z-[999] fixed transition-all inset-0 overflow-x-hidden overflow-y-auto"
+    [class.active]="showConfirmModal()"
+  >
+    <div class="popup-dialog flex transition-all max-w-[550px] min-h-full items-center mx-auto">
+      <div
+        class="trezo-card w-full bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md"
+      >
+        <div
+          class="trezo-card-header bg-gray-50 dark:bg-[#15203c] mb-[20px] md:mb-[25px] flex items-center justify-between -mx-[20px] md:-mx-[25px] -mt-[20px] md:-mt-[25px] p-[20px] md:p-[25px] rounded-t-md"
+        >
+          <div class="trezo-card-title">
+            <h5 class="mb-0">
+              Confirmar {{ isEditMode() ? 'actualización' : 'creación' }} de empresa
+            </h5>
+          </div>
+          <div class="trezo-card-subtitle">
+            <button
+              type="button"
+              class="text-[23px] transition-all leading-none text-black dark:text-white hover:text-primary-500"
+              (click)="closeConfirmModal()"
+            >
+              <i class="ri-close-fill"></i>
+            </button>
+          </div>
+        </div>
+        <div class="trezo-card-content pb-[20px] md:pb-[25px]">
+          <p class="mb-[10px] text-sm text-gray-600 dark:text-gray-300">
+            Revisa el resumen antes de guardar. Una vez confirmado, los datos se enviarán al
+            backend de llantera-hex.
+          </p>
+          <pre
+            class="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap bg-gray-50 dark:bg-[#15203c] rounded-md p-[12px] mt-[8px]"
+          >{{ confirmText() }}</pre>
+        </div>
+        <div
+          class="trezo-card-footer flex items-center justify-between -mx-[20px] md:-mx-[25px] px-[20px] md:px-[25px] pt-[20px] md:pt-[25px] border-t border-gray-100 dark:border-[#172036]"
+        >
+          <button
+            type="button"
+            class="inline-block py-[10px] px-[30px] bg-danger-500 text-white transition-all hover:bg-danger-400 rounded-md border border-danger-500 hover:border-danger-400"
+            (click)="closeConfirmModal()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="inline-block py-[10px] px-[30px] bg-primary-500 text-white transition-all hover:bg-primary-400 rounded-md border border-primary-500 hover:border-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            (click)="confirmSave()"
+            [disabled]="saving()"
+          >
+            Confirmar y guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

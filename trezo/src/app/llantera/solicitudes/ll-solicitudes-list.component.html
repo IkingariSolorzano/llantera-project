@@ -1,0 +1,348 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    Solicitudes de clientes
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0"
+    >
+      <a
+        routerLink="/dashboard"
+        class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500"
+      >
+        <i
+          class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2"
+        >
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0"
+    >
+      Solicitudes
+    </li>
+  </ol>
+</div>
+
+<div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+  <div class="trezo-card-header sm:flex items-center justify-between gap-[12px]">
+    <div class="trezo-card-title flex-1">
+      <form class="relative sm:w-[265px]" (submit)="$event.preventDefault()">
+        <label
+          class="leading-none absolute ltr:left-[13px] rtl:right-[13px] text-black dark:text-white mt-px top-1/2 -translate-y-1/2"
+        >
+          <i class="material-symbols-outlined !text-[20px]">
+            search
+          </i>
+        </label>
+        <input
+          type="text"
+          name="search"
+          placeholder="Buscar por nombre, mensaje o tipo de solicitud..."
+          class="bg-gray-50 border border-gray-50 h-[36px] text-xs rounded-md w-full block text-black pt-[11px] pb-[12px] ltr:pl-[38px] rtl:pr-[38px] ltr:pr-[13px] ltr:md:pr-[16px] rtl:pl-[13px] rtl:md:pl-[16px] placeholder:text-gray-500 outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c] dark:placeholder:text-gray-400"
+          [ngModel]="searchTerm()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </form>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-[8px] mt-[10px] sm:mt-0">
+      <div>
+        <label class="block text-[11px] mb-[3px] text-gray-500 dark:text-gray-400">
+          Estado
+        </label>
+        <select
+          class="bg-gray-50 border border-gray-50 h-[32px] text-xs rounded-md min-w-[130px] text-black px-[10px] outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c]"
+          [ngModel]="statusFilter()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onStatusFilterChange($event)"
+        >
+          <option value="">Todos</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="vista">Vista</option>
+          <option value="atendida">Atendida</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-[11px] mb-[3px] text-gray-500 dark:text-gray-400">
+          Empleado asignado
+        </label>
+        <select
+          class="bg-gray-50 border border-gray-50 h-[32px] text-xs rounded-md min-w-[150px] text-black px-[10px] outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c]"
+          [ngModel]="employeeFilter()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onEmployeeFilterChange($event)"
+        >
+          <option value="">Todos</option>
+          @for (empleado of empleados(); track empleado.id) {
+            <option [value]="empleado.id">
+              {{ (empleado.name || empleado.email) || ('Empleado #' + empleado.id) }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  @if (totalSolicitudes() > 0) {
+    <div class="mt-[18px] text-sm text-gray-500 dark:text-gray-400">
+      {{ totalSolicitudes() }} solicitud{{ totalSolicitudes() === 1 ? '' : 'es' }} encontrada{{ totalSolicitudes() === 1 ? '' : 's' }}
+    </div>
+  }
+</div>
+
+@if (loading()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="flex items-center gap-[12px] text-gray-500 dark:text-gray-400">
+      <span class="loading loading-spinner loading-md"></span>
+      Cargando solicitudes...
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="text-danger-500 font-medium mb-[12px]">
+      {{ error() }}
+    </div>
+    <button
+      type="button"
+      (click)="retry()"
+      class="px-[14px] py-[6px] rounded-md border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition-all"
+    >
+      Reintentar
+    </button>
+  </div>
+} @else if (totalSolicitudes() === 0) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px] text-center text-gray-500 dark:text-gray-400">
+    No se encontraron solicitudes con el criterio proporcionado.
+  </div>
+} @else {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+    <div class="trezo-card-content">
+      <div class="table-responsive overflow-x-auto">
+        <table class="w-full">
+          <thead class="text-black dark:text-white">
+            <tr>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap ltr:first:rounded-tl-md ltr:last:rounded-tr-md rtl:first:rounded-tr-md rtl:last:rounded-tl-md"
+              >
+                Cliente
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap"
+              >
+                Solicitud
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap max-w-[260px]"
+              >
+                Mensaje
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap"
+              >
+                Contacto
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap"
+              >
+                Estado
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap"
+              >
+                Empleado asignado
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap max-w-[260px]"
+              >
+                Acuerdo
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap"
+              >
+                Fechas
+              </th>
+            </tr>
+          </thead>
+          <tbody class="text-black dark:text-white">
+            @for (solicitud of solicitudes(); track solicitud.id) {
+              <tr>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036]"
+                >
+                  <div class="flex flex-col">
+                    <span class="font-medium">
+                      {{ solicitud.fullName || 'Sin nombre' }}
+                    </span>
+                    <span class="text-[11px] text-gray-500 dark:text-gray-400">
+                      {{ solicitud.id }}
+                    </span>
+                  </div>
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036]"
+                >
+                  {{ formatRequestType(solicitud.requestType) }}
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] max-w-[260px]"
+                >
+                  <span class="block text-xs text-gray-700 dark:text-gray-300 line-clamp-2">
+                    {{ solicitud.message || 'Sin mensaje' }}
+                  </span>
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036]"
+                >
+                  <div class="text-xs space-y-[2px]">
+                    @if (solicitud.phone) {
+                      <div>
+                        <span class="text-gray-500 dark:text-gray-400">Tel:</span>
+                        {{ solicitud.phone }}
+                      </div>
+                    }
+                    @if (solicitud.email) {
+                      <div>
+                        <span class="text-gray-500 dark:text-gray-400">Email:</span>
+                        {{ solicitud.email }}
+                      </div>
+                    }
+                  </div>
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036]"
+                >
+                  <div class="flex items-center gap-[8px]">
+                    <span
+                      class="inline-flex items-center rounded-full text-[11px] px-[10px] py-[3px]"
+                      [ngClass]="{
+                        'text-warning-500 bg-warning-50': solicitud.status === 'pendiente',
+                        'text-info-500 bg-info-50': solicitud.status === 'vista',
+                        'text-success-500 bg-success-50': solicitud.status === 'atendida',
+                      }"
+                    >
+                      {{ formatStatus(solicitud.status) }}
+                    </span>
+                  </div>
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036]"
+                >
+                  <select
+                    class="h-[28px] text-[11px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#15203c] px-[8px] min-w-[150px]"
+                    [ngModel]="solicitud.employeeId || ''"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="onAssignEmpleado(solicitud, $event)"
+                    [disabled]="updatingId() === solicitud.id"
+                  >
+                    <option value="">Sin asignar</option>
+                    @for (empleado of empleados(); track empleado.id) {
+                      <option [value]="empleado.id">
+                        {{ (empleado.name || empleado.email) || ('Empleado #' + empleado.id) }}
+                      </option>
+                    }
+                  </select>
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] max-w-[260px]"
+                >
+                  <div class="flex items-start gap-[8px]">
+                    <div class="flex-1">
+                      <span class="block text-xs text-gray-700 dark:text-gray-300 line-clamp-2">
+                        {{ solicitud.agreement || 'Sin acuerdo registrado' }}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      class="text-primary-500 leading-none hover:opacity-80 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      (click)="openAgreementModal(solicitud)"
+                      [disabled]="!solicitud.employeeId || solicitud.status === 'handled'"
+                      [attr.title]="
+                        !solicitud.employeeId
+                          ? 'Asigna un empleado para registrar acuerdo'
+                          : (solicitud.status === 'handled'
+                              ? 'La solicitud atendida ya no puede editarse'
+                              : 'Editar acuerdo')
+                      "
+                    >
+                      <i class="material-symbols-outlined !text-[18px]">
+                        edit
+                      </i>
+                    </button>
+                  </div>
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036]"
+                >
+                  <div class="text-xs text-gray-500 dark:text-gray-400 space-y-[2px]">
+                    <div>
+                      Creado: {{ solicitud.createdAt | date: 'short' }}
+                    </div>
+                    @if (solicitud.attendedAt) {
+                      <div>
+                        Atendido: {{ solicitud.attendedAt | date: 'short' }}
+                      </div>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}
+
+@if (editingAgreement()) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 dark:bg-black/60">
+    <div class="bg-white dark:bg-[#0c1427] rounded-md shadow-lg max-w-md w-full mx-[16px] p-[20px] md:p-[25px]">
+      <h5 class="mb-[10px] text-[15px] md:text-[16px] font-semibold">
+        Editar acuerdo de solicitud
+      </h5>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mb-[12px]">
+        Registra un resumen del acuerdo o notas internas sobre el seguimiento de esta solicitud.
+      </p>
+      <div class="mb-[12px]">
+        <label class="mb-[6px] text-black dark:text-white font-medium block text-xs">
+          Acuerdo / notas internas
+        </label>
+        <textarea
+          rows="4"
+          class="w-full rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[12px] py-[8px] text-xs text-black dark:text-white outline-0 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+          placeholder="Ej. Se acordó contactar al cliente el próximo lunes para enviar cotización detallada."
+          [ngModel]="agreementDraft()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onAgreementDraftChange($event)"
+        ></textarea>
+      </div>
+      @if (agreementError()) {
+        <div class="mb-[10px] text-xs text-danger-500">
+          {{ agreementError() }}
+        </div>
+      }
+      <div class="flex items-center justify-end gap-[10px] mt-[10px]">
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md border border-gray-200 text-gray-700 dark:text-gray-300 dark:border-[#172036] text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-[#15203c] transition-all"
+          (click)="closeAgreementModal()"
+          [disabled]="savingAgreement()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md bg-primary-500 text-white text-xs md:text-sm font-medium hover:bg-primary-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          (click)="saveAgreement()"
+          [disabled]="savingAgreement()"
+        >
+          {{ savingAgreement() ? 'Guardando...' : 'Guardar acuerdo' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

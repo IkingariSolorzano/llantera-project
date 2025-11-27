@@ -1,0 +1,312 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    Marcas de llantas
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      <a routerLink="/dashboard" class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500">
+        <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2">
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      Marcas
+    </li>
+  </ol>
+</div>
+
+<div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+  <div class="trezo-card-header sm:flex items-center justify-between">
+    <div class="trezo-card-title">
+      <form class="relative sm:w-[265px]" (submit)="$event.preventDefault()">
+        <label class="leading-none absolute ltr:left-[13px] rtl:right-[13px] text-black dark:text-white mt-px top-1/2 -translate-y-1/2">
+          <i class="material-symbols-outlined !text-[20px]">
+            search
+          </i>
+        </label>
+        <input
+          type="text"
+          name="search"
+          placeholder="Buscar marca por nombre o alias..."
+          class="bg-gray-50 border border-gray-50 h-[36px] text-xs rounded-md w-full block text-black pt-[11px] pb-[12px] ltr:pl-[38px] rtl:pr-[38px] ltr:pr-[13px] ltr:md:pr-[16px] rtl:pl-[13px] rtl:md:pl-[16px] placeholder:text-gray-500 outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c] dark:placeholder:text-gray-400"
+          [ngModel]="searchTerm()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </form>
+    </div>
+    <div class="trezo-card-subtitle mt-[15px] sm:mt-0">
+      <button
+        type="button"
+        class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white"
+        (click)="openCreate()"
+      >
+        <span class="inline-block relative ltr:pl-[22px] rtl:pr-[22px]">
+          <i class="material-symbols-outlined !text-[22px] absolute ltr:-left-[4px] rtl:-right-[4px] top-1/2 -translate-y-1/2">
+            add
+          </i>
+          Nueva marca
+        </span>
+      </button>
+    </div>
+  </div>
+
+  @if (totalBrands() > 0) {
+    <div class="mt-[18px] text-sm text-gray-500 dark:text-gray-400">
+      {{ totalBrands() }} marca{{ totalBrands() === 1 ? '' : 's' }} encontrada{{ totalBrands() === 1 ? '' : 's' }}
+    </div>
+  }
+</div>
+
+@if (loading()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="flex items-center gap-[12px] text-gray-500 dark:text-gray-400">
+      <span class="loading loading-spinner loading-md"></span>
+      Cargando marcas...
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="text-danger-500 font-medium mb-[12px]">
+      {{ error() }}
+    </div>
+    <button
+      type="button"
+      (click)="retry()"
+      class="px-[14px] py-[6px] rounded-md border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition-all"
+    >
+      Reintentar
+    </button>
+  </div>
+} @else if (totalBrands() === 0) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px] text-center text-gray-500 dark:text-gray-400">
+    No se encontraron marcas con este criterio.
+  </div>
+} @else {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+    <div class="trezo-card-content">
+      <div class="table-responsive overflow-x-auto">
+        <table class="w-full">
+          <thead class="text-black dark:text-white">
+            <tr>
+              <th class="ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap ltr:first:rounded-tl-md ltr:last:rounded-tr-md rtl:first:rounded-tr-md rtl:last:rounded-tl-md">
+                <div class="form-check relative top-[2px]">
+                  <input type="checkbox" class="cursor-pointer" disabled />
+                </div>
+              </th>
+              <th class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap">
+                Marca
+              </th>
+              <th class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap">
+                Aliases
+              </th>
+              <th class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap">
+                Creado
+              </th>
+              <th class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap">
+                Actualizado
+              </th>
+              <th class="font-medium ltr:text-left rtl:text-right px-[20px] py-[11px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap">
+                Acción
+              </th>
+            </tr>
+          </thead>
+          <tbody class="text-black dark:text-white">
+            @for (brand of brands(); track brand.id) {
+              <tr>
+                <td class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">
+                  <div class="form-check relative top-[2px]">
+                    <input type="checkbox" class="cursor-pointer" disabled />
+                  </div>
+                </td>
+                <td class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">
+                  <span class="font-medium">
+                    {{ brand.nombre }}
+                  </span>
+                </td>
+                <td class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">
+                  @if (!brand.aliases || brand.aliases.length === 0) {
+                    <span class="text-gray-500 dark:text-gray-400">Sin alias</span>
+                  } @else {
+                    <div class="flex flex-wrap gap-[6px]">
+                      @for (alias of brand.aliases; track alias) {
+                        <span class="px-[8px] py-[2px] text-xs rounded-full bg-gray-100 dark:bg-[#15203c] text-gray-700 dark:text-gray-300">
+                          {{ alias }}
+                        </span>
+                      }
+                    </div>
+                  }
+                </td>
+                <td class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">
+                  <span class="text-gray-500 dark:text-gray-400">
+                    {{ brand.creadoEn | date: 'short' }}
+                  </span>
+                </td>
+                <td class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">
+                  <span class="text-gray-500 dark:text-gray-400">
+                    {{ brand.actualizadoEn | date: 'short' }}
+                  </span>
+                </td>
+                <td class="ltr:text-left rtl:text-right whitespace-nowrap px-[20px] py-[15px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l">
+                  <div class="flex items-center gap-[9px]">
+                    <button
+                      type="button"
+                      class="text-gray-500 dark:text-gray-400 leading-none hover:text-primary-500 transition"
+                      title="Editar"
+                      (click)="openEdit(brand)"
+                    >
+                      <i class="material-symbols-outlined !text-md">edit</i>
+                    </button>
+                    <button
+                      type="button"
+                      class="text-danger-500 leading-none hover:opacity-80 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="Eliminar"
+                      [disabled]="deletingId() === brand.id"
+                      (click)="openDeleteConfirm(brand)"
+                    >
+                      <i class="material-symbols-outlined !text-md">delete</i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showForm()) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 dark:bg-black/60">
+    <div class="bg-white dark:bg-[#0c1427] rounded-md shadow-lg max-w-md w-full mx-[16px] p-[20px] md:p-[25px]">
+      <h5 class="mb-[10px] text-[15px] md:text-[16px] font-semibold">
+        {{ editingBrand() ? 'Editar marca' : 'Nueva marca' }}
+      </h5>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mb-[16px]">
+        Define el nombre oficial de la marca y opcionalmente una lista de aliases comunes para facilitar las búsquedas y la importación de catálogos.
+      </p>
+      <div class="mb-[15px]">
+        <label class="mb-[8px] text-black dark:text-white font-medium block">
+          Nombre de la marca
+        </label>
+        <input
+          type="text"
+          class="h-[44px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+          placeholder="Ej. Michelin"
+          [ngModel]="formNombre()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onFormNombreChange($event)"
+        />
+      </div>
+      <div class="mb-[15px]">
+        <label class="mb-[8px] text-black dark:text-white font-medium block">
+          Aliases
+        </label>
+        <div class="flex gap-[8px] mb-[8px]">
+          <input
+            type="text"
+            class="flex-1 h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+            placeholder="Ej. Mich, Michelin Llantas..."
+            [ngModel]="aliasInput()"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onAliasInputChange($event)"
+            (keydown.enter)="$event.preventDefault(); addAlias()"
+          />
+          <button
+            type="button"
+            class="px-[12px] py-[8px] rounded-md bg-primary-500 text-white text-xs font-medium hover:bg-primary-600 transition-all"
+            (click)="addAlias()"
+          >
+            Agregar
+          </button>
+        </div>
+        @if (formAliases().length > 0) {
+          <div class="flex flex-wrap gap-[6px]">
+            @for (alias of formAliases(); track alias) {
+              <span class="inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full bg-gray-100 dark:bg-[#15203c] text-xs text-gray-700 dark:text-gray-300">
+                <span>{{ alias }}</span>
+                <button
+                  type="button"
+                  class="text-gray-400 hover:text-danger-500 leading-none"
+                  (click)="removeAlias(alias)"
+                >
+                  <i class="material-symbols-outlined !text-[16px]">close</i>
+                </button>
+              </span>
+            }
+          </div>
+        } @else {
+          <div class="text-xs text-gray-500 dark:text-gray-400">
+            Aún no hay aliases agregados.
+          </div>
+        }
+      </div>
+      @if (formError()) {
+        <div class="mb-[10px] text-xs text-danger-500">
+          {{ formError() }}
+        </div>
+      }
+      <div class="flex items-center justify-end gap-[10px] mt-[10px]">
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md border border-gray-200 text-gray-700 dark:text-gray-300 dark:border-[#172036] text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-[#15203c] transition-all"
+          (click)="closeForm()"
+          [disabled]="saving()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md bg-primary-500 text-white text-xs md:text-sm font-medium hover:bg-primary-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          (click)="saveForm()"
+          [disabled]="saving()"
+        >
+          {{ saving() ? 'Guardando...' : (editingBrand() ? 'Guardar cambios' : 'Crear marca') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (deleteConfirmBrand()) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 dark:bg-black/60">
+    <div class="bg-white dark:bg-[#0c1427] rounded-md shadow-lg max-w-sm w-full mx-[16px] p-[20px] md:p-[25px]">
+      <h5 class="mb-[8px] text-[15px] md:text-[16px] font-semibold">
+        Eliminar marca
+      </h5>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-[10px]">
+        ¿Deseas eliminar la marca
+        <span class="font-semibold">{{ deleteConfirmBrand()?.nombre }}</span>?
+      </p>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mb-[12px]">
+        Si hay llantas asociadas a esta marca, la operación será rechazada.
+      </p>
+      @if (deleteError()) {
+        <div class="mb-[10px] text-xs text-danger-500">
+          {{ deleteError() }}
+        </div>
+      }
+      <div class="flex items-center justify-end gap-[10px]">
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md border border-gray-200 text-gray-700 dark:text-gray-300 dark:border-[#172036] text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-[#15203c] transition-all"
+          (click)="cancelDelete()"
+          [disabled]="deletingId() === deleteConfirmBrand()?.id"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md bg-danger-500 text-white text-xs md:text-sm font-medium hover:bg-danger-400 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          (click)="confirmDelete()"
+          [disabled]="deletingId() === deleteConfirmBrand()?.id"
+        >
+          {{ deletingId() === deleteConfirmBrand()?.id ? 'Eliminando...' : 'Sí, eliminar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,349 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    {{ pageTitle() }}
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0"
+    >
+      <a
+        routerLink="/dashboard"
+        class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500"
+      >
+        <i
+          class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2"
+        >
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px]">Llantas</li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px]">{{ pageTitle() }}</li>
+  </ol>
+</div>
+
+@if (loading()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md text-sm text-gray-500 dark:text-gray-400">
+    Cargando información de la llanta...
+  </div>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="grid lg:grid-cols-12 gap-[25px]">
+      <div class="lg:col-span-8">
+        <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+          <div class="trezo-card-content space-y-[16px]">
+            <div class="grid md:grid-cols-3 gap-[16px]">
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">SKU</label>
+                <input
+                  type="text"
+                  formControlName="sku"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[14px] block w-full outline-0 text-sm"
+                  [class.bg-gray-100]="isEditMode()"
+                  [class.dark:bg-[#15203c]]="isEditMode()"
+                  [readonly]="isEditMode()"
+                  placeholder="SKU único de la llanta"
+                />
+                @if (isInvalid('sku')) {
+                  <small class="text-danger-500">El SKU es obligatorio.</small>
+                }
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Marca</label>
+                <select
+                  formControlName="marcaId"
+                  class="h-[45px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer text-sm text-black dark:text-white"
+                >
+                  <option [ngValue]="null">Selecciona una marca</option>
+                  @for (brand of brands(); track brand.id) {
+                    <option [ngValue]="brand.id">{{ brand.nombre }}</option>
+                  }
+                </select>
+                @if (isInvalid('marcaId')) {
+                  <small class="text-danger-500">La marca es obligatoria.</small>
+                }
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Modelo</label>
+                <input
+                  type="text"
+                  formControlName="modelo"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                  placeholder="Modelo"
+                />
+                @if (isInvalid('modelo')) {
+                  <small class="text-danger-500">El modelo es obligatorio.</small>
+                }
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-[16px]">
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Ancho</label>
+                <input
+                  type="number"
+                  formControlName="ancho"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                  min="0"
+                />
+                @if (isInvalid('ancho')) {
+                  <small class="text-danger-500">Ingresa un ancho válido.</small>
+                }
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Perfil</label>
+                <input
+                  type="number"
+                  formControlName="perfil"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Rin</label>
+                <input
+                  type="number"
+                  formControlName="rin"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                  step="0.5"
+                  min="0"
+                />
+                @if (isInvalid('rin')) {
+                  <small class="text-danger-500">Ingresa un rin válido.</small>
+                }
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Medida original</label>
+                <input
+                  type="text"
+                  formControlName="medidaOriginal"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                  placeholder="225/60 R17"
+                />
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-[16px]">
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Construcción</label>
+                <select
+                  formControlName="construccion"
+                  class="h-[45px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer text-sm text-black dark:text-white"
+                >
+                  <option value="">Selecciona</option>
+                  @for (c of construcciones; track c) {
+                    <option [ngValue]="c">{{ c }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Tipo de tubo</label>
+                <select
+                  formControlName="tipoTubo"
+                  class="h-[45px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer text-sm text-black dark:text-white"
+                >
+                  <option value="">Selecciona</option>
+                  @for (t of tiposTubo; track t) {
+                    <option [ngValue]="t">{{ t }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Capas</label>
+                <select
+                  formControlName="calificacionCapas"
+                  class="h-[45px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer text-sm text-black dark:text-white"
+                >
+                  <option value="">Sin especificar</option>
+                  @for (capa of capas; track capa) {
+                    <option [ngValue]="capa">{{ capa }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Uso</label>
+                <select
+                  formControlName="abreviaturaUso"
+                  class="h-[45px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer text-sm text-black dark:text-white"
+                >
+                  <option value="">Sin especificar</option>
+                  @for (u of usos; track u.code) {
+                    <option [ngValue]="u.code">{{ u.code }} - {{ u.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-[16px] mt-[10px]">
+            <!--   <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Tipo normalizado</label>
+                <select
+                  formControlName="tipoNormalizado"
+                  class="h-[45px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer text-sm text-black dark:text-white"
+                >
+                  <option value="">Sin especificar</option>
+                  @for (t of tiposNormalizados; track t) {
+                    <option [ngValue]="t">{{ t }}</option>
+                  }
+                </select>
+              </div> -->
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Índice de carga</label>
+                <select
+                  formControlName="indiceCarga"
+                  class="h-[45px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer text-sm text-black dark:text-white"
+                >
+                  <option value="">Sin especificar</option>
+                  @for (i of indicesCarga; track i) {
+                    <option [ngValue]="i.toString()">{{ i }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Índice de velocidad</label>
+                <select
+                  formControlName="indiceVelocidad"
+                  class="h-[45px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer text-sm text-black dark:text-white"
+                >
+                  <option value="">Sin especificar</option>
+                  @for (v of indicesVelocidad; track v) {
+                    <option [ngValue]="v">{{ v }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Precio público</label>
+                <input
+                  type="number"
+                  formControlName="precioPublico"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                  min="0"
+                  step="0.01"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-[8px] text-black dark:text-white font-medium block">Descripción</label>
+              <textarea
+                formControlName="descripcion"
+                class="rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] pt-[10px] pb-[10px] block w-full outline-0 text-sm h-[90px] resize-none"
+                placeholder="Descripción comercial de la llanta"
+              ></textarea>
+            </div>
+
+            <div>
+              <label class="mb-[8px] text-black dark:text-white font-medium block">URL de imagen</label>
+              <input
+                type="text"
+                formControlName="urlImagen"
+                class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                placeholder="https://..."
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+          <div class="trezo-card-content space-y-[12px]">
+            <h6 class="font-semibold text-black dark:text-white mb-[8px]">Inventario</h6>
+            <div class="grid md:grid-cols-2 gap-[16px]">
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Cantidad</label>
+                <input
+                  type="number"
+                  formControlName="cantidad"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label class="mb-[8px] text-black dark:text-white font-medium block">Stock mínimo</label>
+                <input
+                  type="number"
+                  formControlName="stockMinimo"
+                  class="h-[45px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[14px] block w-full outline-0 text-sm"
+                  min="0"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+          <div class="trezo-card-content space-y-[10px]">
+            <h6 class="font-semibold text-black dark:text-white mb-[8px]">Precios</h6>
+            @if (priceCodes().length === 0) {
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                No hay columnas de precios configuradas para esta llanta.
+              </p>
+            } @else {
+              <div class="grid md:grid-cols-2 gap-[12px]">
+                @for (code of priceCodes(); track code) {
+                  <div>
+                    <label class="mb-[6px] text-black dark:text-white font-medium block">
+                      {{ code | uppercase }}
+                    </label>
+                    <input
+                      type="number"
+                      class="h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[12px] block w-full outline-0 text-sm"
+                      [ngModel]="prices()[code] ?? null"
+                      [ngModelOptions]="{ standalone: true }"
+                      (ngModelChange)="onPriceChange(code, $event)"
+                      [readonly]="isEditMode() && isDerivedPriceCode(code)"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-4">
+        <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md space-y-[12px] text-sm text-gray-500 dark:text-gray-400">
+          <p>
+            Edita la información técnica, inventario y precios de la llanta. El precio de lista se seguirá
+            sincronizando con el precio público en la tabla cuando se actualice desde el admin.
+          </p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            SKU actual: <span class="font-semibold">{{ form.value.sku || 'Sin asignar' }}</span>
+          </p>
+          @if (error()) {
+            <div class="text-danger-500">{{ error() }}</div>
+          }
+          @if (success()) {
+            <div class="text-success-500">{{ success() }}</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="trezo-card mb-[25px]">
+      <div class="trezo-card-content">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="font-medium inline-block transition-all rounded-md md:text-md ltr:mr-[19px] rtl:ml-[19px] py-[10px] md:py-[12px] px-[20px] md:px-[22px] bg-danger-500 text-white hover:bg-danger-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="saving()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="font-medium inline-flex items-center gap-[8px] transition-all rounded-md md:text-md py-[10px] md:py-[12px] px-[20px] md:px-[22px] bg-primary-500 text-white hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="saving()"
+        >
+          <span>{{ submitLabel() }}</span>
+          @if (saving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+          }
+        </button>
+      </div>
+    </div>
+  </form>
+}

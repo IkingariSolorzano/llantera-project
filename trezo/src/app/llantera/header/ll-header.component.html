@@ -1,0 +1,90 @@
+<div class="header-area bg-white dark:bg-[#0c1427] py-[13px] px-[20px] md:px-[25px] fixed top-0 z-[6] rounded-b-md transition-all"
+  id="header-area">
+  <div class="flex items-center justify-between gap-2">
+    <div class="flex items-center min-w-0">
+      <div class="relative leading-none top-px mr-[13px] md:mr-[18px] flex-shrink-0">
+        <button type="button" class="hide-sidebar-toggle transition-all inline-block hover:text-primary-500"
+          (click)="toggleSidebar()">
+          <i class="material-symbols-outlined !text-[20px]">
+            menu
+          </i>
+        </button>
+      </div>
+      <div class="hidden md:flex flex-col min-w-0">
+        <span class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Panel de administración</span>
+        <span class="text-xs text-gray-500 dark:text-gray-400 truncate">Llantera de Occidente</span>
+      </div>
+    </div>
+
+    <ul class="flex items-center flex-shrink-0 gap-1">
+      <!-- Botón de tema claro/oscuro -->
+      <li class="relative">
+        <button type="button"
+          class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#15203c] transition-all"
+          (click)="toggleTheme()" aria-label="Cambiar tema">
+          <i class="material-symbols-outlined !text-[20px] text-[#fe7a36]">
+            {{ isDarkMode ? 'dark_mode' : 'light_mode' }}
+          </i>
+        </button>
+      </li>
+
+      <!-- Campana de notificaciones -->
+      <li class="relative">
+        <app-ll-notification-bell />
+      </li>
+
+      <!-- Menú de usuario con avatar -->
+      <li class="relative ml-2">
+        <button type="button"
+          class="flex items-center gap-2 px-2 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-[#15203c] transition-all"
+          (click)="toggleUserMenu()">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#E60012] to-[#ff4d5a] flex items-center justify-center text-white font-semibold text-sm shadow-md">
+            {{ userInitials }}
+          </div>
+          <span class="hidden lg:block text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[120px] truncate">
+            {{ userName }}
+          </span>
+          <i class="material-symbols-outlined !text-[18px] text-gray-500 hidden lg:block">
+            expand_more
+          </i>
+        </button>
+
+        <!-- Dropdown de usuario -->
+        @if (showUserMenu()) {
+          <div class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#0c1427] rounded-xl shadow-2xl border border-gray-200 dark:border-[#172036] overflow-hidden z-50">
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-[#172036]">
+              <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ userName }}</p>
+              <p class="text-xs text-gray-500 truncate">{{ userEmail }}</p>
+            </div>
+            <div class="py-1">
+              <button type="button"
+                class="w-full px-4 py-2.5 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#15203c] flex items-center gap-3 transition-colors"
+                (click)="goToMyAccount()">
+                <i class="material-symbols-outlined !text-[18px] text-gray-500">person</i>
+                Mi cuenta
+              </button>
+              <button type="button"
+                class="w-full px-4 py-2.5 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#15203c] flex items-center gap-3 transition-colors">
+                <i class="material-symbols-outlined !text-[18px] text-gray-500">settings</i>
+                Configuración
+              </button>
+            </div>
+            <div class="border-t border-gray-200 dark:border-[#172036] py-1">
+              <button type="button"
+                class="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                (click)="logout()">
+                <i class="material-symbols-outlined !text-[18px]">logout</i>
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        }
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Overlay para cerrar dropdowns -->
+@if (showUserMenu() || showNotifications()) {
+  <div class="fixed inset-0 z-[5]" (click)="closeAllDropdowns()"></div>
+}

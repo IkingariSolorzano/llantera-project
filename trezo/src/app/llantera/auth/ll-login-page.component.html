@@ -1,0 +1,131 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-50 to-white dark:from-gray-400 dark:via-gray-900 dark:to-dark relative overflow-hidden">
+  <!-- Botón toggle tema -->
+  <button
+    type="button"
+    (click)="toggleTheme()"
+    class="absolute top-4 right-4 z-20 p-3 rounded-full bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-gray-200 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/10 transition-all"
+  >
+    @if (isDarkMode()) {
+      <i class="material-symbols-outlined !text-[20px] text-yellow-400">light_mode</i>
+    } @else {
+      <i class="material-symbols-outlined !text-[20px] text-slate-700">dark_mode</i>
+    }
+  </button>
+
+  <!-- Fondo decorativo animado -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-[#E60012]/10 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-[#E60012]/5 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-[#E60012]/5 to-transparent rounded-full"></div>
+  </div>
+
+  <div class="w-full max-w-md mx-4 relative z-10">
+    <!-- Logo con animación - cambia según tema -->
+    <div class="flex flex-col items-center mb-8 animate-fade-in-down">
+      <div class="relative">
+        <!-- Logo para modo claro -->
+        <img
+          src="/images/llantera/Logo_Llantera_de_Occidente.svg"
+          alt="Llantera de Occidente"
+          class="h-24 md:h-24 object-contain drop-shadow-2xl animate-bounce-slow dark:hidden"
+        />
+        <!-- Logo para modo oscuro -->
+        <img
+          src="/images/llantera/logo_llantera_de_Occidente_dark.svg"
+          alt="Llantera de Occidente"
+          class="h-24 md:h-24 object-contain drop-shadow-2xl animate-bounce-slow hidden dark:block"
+        />
+        <div class="absolute inset-0 bg-[#E60012]/20 dark:bg-white/20 rounded-full blur-xl -z-10 animate-pulse"></div>
+      </div>
+      <h2 class="mt-4 text-xl md:text-2xl font-bold text-gray-900 dark:text-white tracking-tight animate-fade-in" style="animation-delay: 0.2s;">
+        Llantera de Occidente
+      </h2>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 animate-fade-in" style="animation-delay: 0.3s;">
+        Sistema de gestión y ventas
+      </p>
+    </div>
+
+    <!-- Card de login con animación -->
+    <div class="trezo-card bg-white dark:bg-[#0c1427]/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 dark:border-white/10 p-6 md:p-8 animate-fade-in-up" style="animation-delay: 0.4s;">
+      <div class="mb-6 text-center">
+        <h1 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-1">
+          Inicia sesión
+        </h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Accede a tu cuenta para continuar
+        </p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+        <div class="animate-fade-in-left" style="animation-delay: 0.5s;">
+          <label class="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300">Correo electrónico</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+              <i class="material-symbols-outlined !text-[20px]">mail</i>
+            </span>
+            <input
+              type="email"
+              formControlName="email"
+              class="h-12 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 pl-11 pr-4 text-sm text-gray-900 dark:text-white outline-0 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#E60012] focus:bg-white dark:focus:bg-white/10 focus:ring-2 focus:ring-[#E60012]/20"
+              placeholder="tucorreo&#64;ejemplo.com"
+              [class.border-danger-500]="isInvalid('email')"
+            />
+          </div>
+          @if (isInvalid('email')) {
+            <small class="text-[11px] text-red-500 dark:text-red-400 mt-1 block">Ingresa un correo válido.</small>
+          }
+        </div>
+
+        <div class="animate-fade-in-left" style="animation-delay: 0.6s;">
+          <label class="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+              <i class="material-symbols-outlined !text-[20px]">lock</i>
+            </span>
+            <input
+              type="password"
+              formControlName="password"
+              class="h-12 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 pl-11 pr-4 text-sm text-gray-900 dark:text-white outline-0 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#E60012] focus:bg-white dark:focus:bg-white/10 focus:ring-2 focus:ring-[#E60012]/20"
+              placeholder="Mínimo 8 caracteres"
+              [class.border-danger-500]="isInvalid('password')"
+            />
+          </div>
+          @if (isInvalid('password')) {
+            <small class="text-[11px] text-red-500 dark:text-red-400 mt-1 block">La contraseña es obligatoria y debe tener al menos 8 caracteres.</small>
+          }
+        </div>
+
+        @if (error()) {
+          <div class="text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 flex items-center gap-2 animate-shake">
+            <i class="material-symbols-outlined !text-[18px]">error</i>
+            {{ error() }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="w-full h-12 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#E60012] to-[#ff1a2c] hover:from-[#cc0010] hover:to-[#E60012] text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-[#E60012]/25 hover:shadow-xl hover:shadow-[#E60012]/30 hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 animate-fade-in-up"
+          style="animation-delay: 0.7s;"
+          [disabled]="disableForm()"
+        >
+          @if (loading()) {
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          }
+          <span>{{ loading() ? 'Iniciando sesión...' : 'Entrar' }}</span>
+        </button>
+
+        <div class="pt-2 text-center text-xs text-gray-500 animate-fade-in" style="animation-delay: 0.8s;">
+          <span class="hover:text-gray-400 cursor-pointer transition-colors">¿Olvidaste tu contraseña?</span>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer con derechos -->
+    <div class="mt-6 text-center text-[11px] text-gray-500 dark:text-gray-600 animate-fade-in" style="animation-delay: 0.9s;">
+      © {{ currentYear }} Llantera de Occidente. Todos los derechos reservados.
+    </div>
+  </div>
+</div>

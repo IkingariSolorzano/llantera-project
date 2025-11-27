@@ -1,0 +1,829 @@
+<div class="min-h-screen flex flex-col bg-gray-50 dark:bg-[#020617] text-gray-900 dark:text-gray-100">
+  <!-- Navbar / Header -->
+  <header class="sticky top-0 z-30 border-b border-red-700">
+    <!-- Franja superior blanca con logo -->
+    <div class="bg-white dark:bg-[#020617]">
+      <div class="mx-auto px-4 py-3 flex items-center justify-between gap-6">
+        <a routerLink="/" class="flex items-center gap-2 ml-24">
+          <img src="/images/llantera/Logo_Llantera de Occidente.svg" alt="Llantera de Occidente"
+            class="h-12 md:h-12 w-auto mb-2 block dark:hidden" loading="lazy" />
+          <img src="/images/llantera/logo_llantera de occidente-dark.svg" alt="Llantera de Occidente"
+            class="h-12 md:h-12 w-auto mb-2 hidden dark:block" loading="lazy" />
+        </a>
+
+        <div class="hidden md:flex items-center gap-4">
+          <div class="flex items-center gap-4">
+            <img src="/images/llantera/firestone-37577_logosenvector.com_5.svg" alt="Firestone" class="h-6 w-auto"
+              loading="lazy" />
+            <img src="/images/llantera/bridgestone-37571_logosenvector.com_5.svg" alt="Bridgestone"
+              class="h-6 w-auto block dark:hidden" loading="lazy" />
+            <img src="/images/llantera/bridgestone-darl.svg" alt="Bridgestone" class="h-6 w-auto hidden dark:block"
+              loading="lazy" />
+          </div>
+
+          <div class="flex flex-row items-end gap-2 text-[11px] ml-16">
+            <button
+              type="button"
+              class="inline-flex items-center justify-center px-2 py-1 rounded-full border border-gray-300 text-[11px] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#111827] transition-colors"
+              (click)="toggleTheme()"
+              aria-label="Cambiar tema"
+            >
+              <i class="material-symbols-outlined text-sm">light_mode</i>
+            </button>
+            @if (auth.isAuthenticated()) {
+              <button
+                type="button"
+                class="px-3 py-1 rounded-full border border-[#E60012] text-[#E60012] hover:bg-[#E60012] hover:text-white transition-colors"
+                (click)="auth.goToMyAccount()"
+              >
+                Mi cuenta
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="px-3 py-1 rounded-full border border-[#E60012] text-[#E60012] hover:bg-[#E60012] hover:text-white transition-colors"
+                routerLink="/login"
+              >
+                Iniciar sesión
+              </button>
+            }
+            <button
+              type="button"
+              class="px-3 py-1 rounded-full bg-[#E60012] text-white hover:bg-red-700 shadow-sm"
+              (click)="openClienteModal()"
+            >
+              Quiero ser cliente
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Franja inferior negra con menú -->
+    <div class="bg-dark text-white">
+      <div class="max-w-6xl mx-auto px-4 py-1 flex items-center justify-between">
+        <nav class="hidden md:flex items-stretch text-xs md:text-sm text-white/80 uppercase tracking-wide">
+          <a href="#hero" (click)="onMenuClick($event, 'hero')"
+            class="px-4 py-2 flex items-center border-r border-white/10 hover:bg-white/5 hover:text-white transition-colors"
+            [ngClass]="activeSection() === 'hero' ? 'bg-[#E60012] text-white' : ''">
+            Inicio
+          </a>
+          <a href="#servicios" (click)="onMenuClick($event, 'servicios')"
+            class="px-4 py-2 flex items-center border-r border-white/10 hover:bg-white/5 hover:text-white transition-colors"
+            [ngClass]="activeSection() === 'servicios' ? 'bg-[#E60012] text-white' : ''">
+            Servicios
+          </a>
+          <a href="#quienes-somos" (click)="onMenuClick($event, 'quienes-somos')"
+            class="px-4 py-2 flex items-center border-r border-white/10 hover:bg-white/5 hover:text-white transition-colors"
+            [ngClass]="activeSection() === 'quienes-somos' ? 'bg-[#E60012] text-white' : ''">
+            Nosotros
+          </a>
+          <a href="#sucursales" (click)="onMenuClick($event, 'sucursales')"
+            class="px-4 py-2 flex items-center border-r border-white/10 hover:bg-white/5 hover:text-white transition-colors"
+            [ngClass]="activeSection() === 'sucursales' ? 'bg-[#E60012] text-white' : ''">
+            Encuéntranos
+          </a>
+          <a href="#productos-destacados" (click)="onMenuClick($event, 'productos-destacados')"
+            class="px-4 py-2 flex items-center hover:bg-white/5 hover:text-white transition-colors"
+            [ngClass]="activeSection() === 'productos-destacados' ? 'bg-[#E60012] text-white' : ''">
+            Llantas top
+          </a>
+        </nav>
+
+        <button type="button"
+          class="hidden md:inline-flex items-center gap-2 rounded-full px-5 py-1.5 my-1.5 text-xs md:text-sm font-semibold bg-[#E60012] text-white hover:bg-red-700 hover:shadow-md border border-[#E60012]/80 shadow-sm transition-all duration-200"
+          (click)="openCotizador()">
+          <i class="material-symbols-outlined text-sm">tune</i>
+          Cotizador
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="flex-1">
+    <!-- Hero con carrusel full-width -->
+    <section id="hero"
+      class="relative border-b border-gray-100 dark:border-[#172036] bg-black text-white section-animate"
+      [ngClass]="activeSection() === 'hero' ? 'section-animate--visible' : ''">
+      <div class="w-full min-h-[15vh] md:min-h-[20vh] lg:min-h-[70vh] bg-cover bg-center"
+        style="background-image: url('/images/llantera/promo1.jpg')">
+        <div class="relative w-full">
+          <!-- Overlay degradado sólo en la parte inferior -->
+          <div class="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/85 via-black/70 to-transparent">
+          </div>
+
+          <div
+            class="relative max-w-6xl mx-auto min-h-[15vh] md:min-h-[20vh] lg:min-h-[70vh] px-4 py-6 md:py-16 flex flex-col md:flex-row gap-4 items-start">
+            <!-- Texto del carrusel (sin recuadro de fondo) -->
+            <div class="max-w-full p-5 md:p-7 text-white">
+
+              @if (slides.length > 0) { @for (slide of slides;
+              track slide.id) {
+              <div class="space-y-3" [ngClass]="{
+                                    hidden: slide.id !== currentSlideIndex()
+                                }">
+                <h1 class="hero-title text-[2em] md:text-[3.5em] lg:text-[4em] font-extrabold leading-tight text-white">
+                  {{ slide.title }}
+                </h1>
+                <p class="text-sm hero-description md:text-[1em] lg:text-[1.2em] text-gray-200 max-w-2xl">
+                  {{ slide.subtitle }}
+                </p>
+                <div class="flex flex-wrap gap-3 text-xs md:text-sm">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full bg-red-600/80 text-white">
+                    Amplio catálogo de llantas
+                  </span>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full bg-white/10 text-gray-100">
+                    Atención personalizada
+                  </span>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-3 text-xs md:text-sm">
+                  <a href="#contacto"
+                    class="inline-flex items-center px-4 py-2 rounded-md bg-[#E60012] hover:bg-red-700 text-white font-semibold shadow-md">
+                    ¡Agenda tu cita ahora!
+                  </a>
+                  <a href="#productos-destacados"
+                    class="inline-flex items-center px-4 py-2 rounded-md bg-white text-[#020617] border border-transparent hover:bg-gray-100 font-medium">
+                    Ver promociones
+                  </a>
+                </div>
+              </div>
+              } }
+            </div>
+
+            <!-- Recuadro blanco con controles del carrusel -->
+            <div class="absolute -bottom-2 right-4 flex justify-end">
+              <div
+                class="inline-flex items-center gap-3 px-4 py-1 bg-white/95 text-gray-800 rounded-md shadow-2xl text-[11px] md:text-xs">
+                <button type="button"
+                  class="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
+                  (click)="prevSlide()">
+                  <i class="material-symbols-outlined text-base">chevron_left</i>
+                </button>
+                <button type="button"
+                  class="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
+                  (click)="nextSlide()">
+                  <i class="material-symbols-outlined text-base">chevron_right</i>
+                </button>
+
+                <div class="flex items-center gap-1.5 ml-2">
+                  @for (slide of slides; track slide.id) {
+                  <button type="button" class="w-2.5 h-2.5 rounded-full border border-gray-300" [ngClass]="
+                                            slide.id === currentSlideIndex()
+                                                ? 'bg-red-500 border-red-600'
+                                                : 'bg-gray-300'
+                                        " (click)="goToSlide(slide.id)"></button>
+                  }
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Servicios -->
+    <section id="servicios" class="py-10 md:py-14 min-h-[85vh] bg-[#020617] section-animate"
+      [ngClass]="activeSection() === 'servicios' ? 'section-animate--visible' : ''">
+      <div class="max-w-7xl mx-auto px-4 w-full">
+        <h2 class="text-3xl md:text-5xl font-semibold mb-4 text-white">
+          Nuestros servicios integrales
+        </h2>
+        <p class="text-sm md:text-base text-gray-300 max-w-3xl mb-8">
+          Ofrecemos una amplia gama de servicios profesionales para el cuidado y mantenimiento de tus neumáticos
+          y de tu vehículo, combinando experiencia, equipo especializado y marcas líderes en el mercado.
+        </p>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7 text-sm">
+          <div
+            class="trezo-card rounded-md overflow-hidden bg-[#1f2937] text-gray-200 shadow-lg border border-gray-700/60 min-h-[220px]">
+            <div class="p-6 space-y-3 border-t-4 border-danger-700">
+              <div class="flex items-center gap-3 text-red-400">
+                <i class="material-symbols-outlined text-2xl">storefront</i>
+                <span class="text-[12px] uppercase tracking-wide">Venta e instalación de llantas</span>
+              </div>
+              <h3 class="font-semibold text-white text-base md:text-lg">
+                Marcas líderes para todo tipo de vehículo
+              </h3>
+              <p class="text-[12px] md:text-sm text-gray-300 leading-relaxed">
+                Amplio catálogo de llantas Bridgestone, Michelin, Pirelli, Goodyear y más para autos, SUVs y
+                camionetas, con instalación profesional incluida.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="trezo-card rounded-md overflow-hidden bg-[#1f2937] text-gray-200 shadow-lg border border-gray-700/60 min-h-[220px]">
+            <div class="p-6 space-y-3 border-t-4 border-danger-700">
+              <div class="flex items-center gap-3 text-red-400">
+                <i class="material-symbols-outlined text-2xl">tire_repair</i>
+                <span class="text-[12px] uppercase tracking-wide">Alineación y balanceo</span>
+              </div>
+              <h3 class="font-semibold text-white text-base md:text-lg">
+                Manejo seguro y desgaste uniforme
+              </h3>
+              <p class="text-[12px] md:text-sm text-gray-300 leading-relaxed">
+                Equipos de alineación y balanceo de alta precisión para prolongar la vida útil de tus llantas y
+                mejorar el desempeño de tu vehículo.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="trezo-card rounded-md overflow-hidden bg-[#1f2937] text-gray-200 shadow-lg border border-gray-700/60 min-h-[220px]">
+            <div class="p-6 space-y-3 border-t-4 border-danger-700">
+              <div class="flex items-center gap-3 text-red-400">
+                <i class="material-symbols-outlined text-2xl">swap_horiz</i>
+                <span class="text-[12px] uppercase tracking-wide">Rotación de llantas</span>
+              </div>
+              <h3 class="font-semibold text-white text-base md:text-lg">
+                Mayor rendimiento y durabilidad
+              </h3>
+              <p class="text-[12px] md:text-sm text-gray-300 leading-relaxed">
+                Programas de rotación periódica para asegurar un desgaste homogéneo y aprovechar al máximo cada
+                juego de llantas.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="trezo-card rounded-md overflow-hidden bg-[#1f2937] text-gray-200 shadow-lg border border-gray-700/60 min-h-[220px]">
+            <div class="p-6 space-y-3 border-t-4 border-danger-700">
+              <div class="flex items-center gap-3 text-red-400">
+                <i class="material-symbols-outlined text-2xl">build_circle</i>
+                <span class="text-[12px] uppercase tracking-wide">Reparación de pinchaduras</span>
+              </div>
+              <h3 class="font-semibold text-white text-base md:text-lg">
+                Servicio rápido y confiable
+              </h3>
+              <p class="text-[12px] md:text-sm text-gray-300 leading-relaxed">
+                Reparación profesional con materiales de alta calidad para devolverte al camino con seguridad en el
+                menor tiempo posible.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="trezo-card rounded-md overflow-hidden bg-[#1f2937] text-gray-200 shadow-lg border border-gray-700/60 min-h-[220px]">
+            <div class="p-6 space-y-3 border-t-4 border-danger-700">
+              <div class="flex items-center gap-3 text-red-400">
+                <i class="material-symbols-outlined text-2xl">health_and_safety</i>
+                <span class="text-[12px] uppercase tracking-wide">Mantenimiento preventivo</span>
+              </div>
+              <h3 class="font-semibold text-white text-base md:text-lg">
+                Revisión integral de seguridad
+              </h3>
+              <p class="text-[12px] md:text-sm text-gray-300 leading-relaxed">
+                Inspección de frenos, suspensión y amortiguadores para detectar a tiempo cualquier riesgo y mantener
+                tu vehículo en óptimas condiciones.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="trezo-card rounded-md overflow-hidden bg-[#1f2937] text-gray-200 shadow-lg border border-gray-700/60 min-h-[220px]">
+            <div class="p-6 space-y-3 border-t-4 border-danger-700">
+              <div class="flex items-center gap-3 text-red-400">
+                <i class="material-symbols-outlined text-2xl">oil_barrel</i>
+                <span class="text-[12px] uppercase tracking-wide">Cambio de aceite</span>
+              </div>
+              <h3 class="font-semibold text-white text-base md:text-lg">
+                Cuidado del motor
+              </h3>
+              <p class="text-[12px] md:text-sm text-gray-300 leading-relaxed">
+                Servicios de cambio de aceite convencional y sintético, filtros y revisión básica para cuidar el
+                corazón de tu vehículo.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ¿Quiénes somos? -->
+    <section id="quienes-somos"
+      class="min-h-[85vh] py-10 md:py-14 bg-white dark:bg-[#020617] section-animate flex items-center"
+      [ngClass]="activeSection() === 'quienes-somos' ? 'section-animate--visible' : ''">
+
+      <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
+        <div class="flex-1 flex flex-col justify-center">
+          <h2 class="text-xl md:text-2xl font-semibold mb-4">
+            Nosotros
+          </h2>
+          <p class="text-xs md:text-sm text-[#E60012] font-semibold uppercase tracking-wide mb-2">
+            Tu llantera de confianza en Morelia.
+          </p>
+          <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-3">
+            En Llantera de Occidente somos una empresa moreliana dedicada a proporcionar productos de la más alta
+            calidad y servicios automotrices especializados, enfocados en la seguridad y satisfacción total de
+            nuestros clientes.
+          </p>
+          <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-3">
+            Nos distingue nuestro equipo técnico altamente capacitado y el uso de tecnología de vanguardia en cada
+            servicio. Trabajamos con las mejores marcas para ofrecerte el mejor valor por tu inversión.
+          </p>
+          <p class="text-sm md:text-base text-gray-700 dark:text-gray-200 font-medium">
+            Somos distribuidor autorizado de marcas como Bridgestone y Firestone, respaldando cada trabajo con
+            garantía y confianza.
+          </p>
+        </div>
+        <div class="hidden md:block">
+          <div
+            class="rounded-xl border border-dashed border-gray-200 dark:border-[#172036] h-52 md:h-64 flex items-center justify-center text-xs md:text-sm text-gray-500 dark:text-gray-400">
+            Imagen de nuestro equipo, taller y sucursales en Morelia.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sucursales / Ubicación -->
+    <section id="sucursales" class="min-h-[85vh] py-10 md:py-14 bg-gray-100 dark:bg-[#020617] section-animate"
+      [ngClass]="activeSection() === 'sucursales' ? 'section-animate--visible' : ''">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-xl md:text-2xl font-semibold mb-2">
+          Encuéntranos
+        </h2>
+        <p class="text-xs md:text-sm text-[#E60012] font-semibold uppercase tracking-wide mb-1">
+          Dos sucursales estratégicas para estar cerca de ti.
+        </p>
+        <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300 mb-6 max-w-3xl">
+          Visítanos en nuestras sucursales estratégicamente ubicadas en la ciudad de Morelia. Llámanos para agendar
+          tu cita o resolver cualquier duda sobre nuestros servicios y promociones.
+        </p>
+
+        <div class="grid gap-6 text-sm md:grid-cols-2 md:items-start">
+          <!-- Columna izquierda: mapa -->
+          <div
+            class="trezo-card bg-white dark:bg-[#020617] rounded-md p-4 shadow-sm border border-gray-200/80 dark:border-[#172036] flex flex-col justify-between h-[50vh]">
+            <div class="flex items-center justify-between mb-2 text-[11px] md:text-xs">
+              <span class="font-medium text-gray-700 dark:text-gray-200">Mapa de sucursales en Morelia</span>
+            </div>
+
+            <div class="map-container" style="width: 100%; height: 500px;">
+              @if (selectedBranchId() === 'periodismo') {
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15027.221879099487!2d-101.24456048011781!3d19.67830297277952!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842d0c20e4bac06d%3A0x4e090d537e3b00bc!2sLlantera%20De%20Occidente!5e0!3m2!1ses-419!2smx!4v1763919826563!5m2!1ses-419!2smx"
+                width="100%" height="100%" style="border:0;" allowfullscreen loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+              </iframe>
+              } @else {
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15026.803313987206!2d-101.19272721284177!3d19.68276500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842d0de559aaf95d%3A0x3494f5f8a3b5b897!2sLlantera%20De%20Occidente!5e0!3m2!1ses-419!2smx!4v1763919918846!5m2!1ses-419!2smx"
+                width="100%" height="100%" style="border:0;" allowfullscreen loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+              </iframe>
+              }
+            </div>
+          </div>
+
+          <!-- Columna derecha: sucursales apiladas -->
+          <div class="flex flex-col gap-6">
+            <div
+              class="trezo-card bg-white dark:bg-[#020617] rounded-md p-4 shadow-sm cursor-pointer transition transform duration-200 hover:-translate-y-1 hover:shadow-md active:scale-95"
+              data-place-id="ChIJbcC65CAMLYQRvAA7flMNCU4" (click)="selectBranch('periodismo')"
+              [ngClass]="selectedBranchId() === 'periodismo' ? 'border-l-[6px] border-l-[#E60012] dark:border-l-[#E60012] shadow-md' : ''">
+              <h3 class="font-medium mb-1">Sucursal Periodismo</h3>
+              <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300 mb-2">
+                Av. Periodismo José Tocaven Lavín 2649, Carlos María de Bustamante, 58197 Morelia, Mich.
+              </p>
+              <p class="text-xs md:text-sm text-gray-700 dark:text-gray-200 mb-1">
+                Teléfono: (443) 326 1312
+              </p>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-0">
+                Horario: Lun - Vie 9:00 AM - 6:30 PM
+              </p>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">
+                Sáb 9:00 AM - 2:00 PM
+              </p>
+            </div>
+
+            <div
+              class="trezo-card bg-white dark:bg-[#020617] rounded-md p-4 shadow-sm cursor-pointer transition transform duration-200 hover:-translate-y-1 hover:shadow-md active:scale-95"
+              data-place-id="ChIJXfmqWeUNLYQRl7i1o_j1lDQ" (click)="selectBranch('camelinas')"
+              [ngClass]="selectedBranchId() === 'camelinas' ? 'border-l-[6px] border-l-[#E60012] dark:border-l-[#E60012] shadow-md' : ''">
+              <h3 class="font-medium mb-1">Sucursal Camelinas</h3>
+              <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300 mb-2">
+                Av. Jesús Sansón Flores 371, Camelinas, 58290 Morelia, Mich.
+              </p>
+              <p class="text-xs md:text-sm text-gray-700 dark:text-gray-200 mb-1">
+                Teléfono: (443) 315 0841
+              </p>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-0">
+                Horario: Lun - Vie 9:00 AM - 7:00 PM
+              </p>
+              <p class="text-[11px] text-gray-500 dark:text-gray-400">
+                Sáb 9:00 AM - 2:00 PM
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Productos destacados / Lo más buscado -->
+    <section id="productos-destacados" class="min-h-[85vh] py-10 md:py-14 bg-[#020617] section-animate"
+      [ngClass]="activeSection() === 'productos-destacados' ? 'section-animate--visible' : ''">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-xl md:text-2xl font-semibold mb-6 text-white">
+          Llantas top
+        </h2>
+        <p class="text-xs md:text-sm text-[#E60012] font-semibold uppercase tracking-wide mb-2 max-w-3xl">
+          Las favoritas de nuestros clientes por desempeño, seguridad y durabilidad.
+        </p>
+        <p class="text-xs md:text-sm text-gray-300 mb-4 max-w-3xl">
+          Conoce algunas de las llantas más solicitadas por nuestros clientes, ideales para diferentes tipos de
+          vehículos y necesidades de manejo.
+        </p>
+
+        <!-- Carrusel tipo carrete de llantas top -->
+        <div class="relative flex items-center justify-center">
+          <!-- Chevron izquierdo -->
+          <button type="button"
+            class="hidden md:inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-700/60 text-gray-200 hover:bg-gray-800 hover:border-gray-500 mr-2"
+            (click)="prevTopTire()">
+            <i class="material-symbols-outlined text-base">chevron_left</i>
+          </button>
+
+          <div class="flex-1 overflow-hidden">
+            <div class="flex items-center justify-center gap-3 md:gap-4">
+              @for (item of getVisibleTopTires(); track item.tire.id; let i = $index) {
+              <div
+                class="trezo-card bg-[#111827] text-gray-100 rounded-lg shadow-sm flex flex-col transition-all duration-500 ease-out"
+                [ngClass]="item.position === 'center'
+                  ? 'p-5 md:p-7 min-h-[230px] md:min-h-[320px] scale-105 md:scale-110 translate-y-0 z-10'
+                  : item.position === 'left'
+                    ? 'p-3 md:p-4 min-h-[150px] md:min-h-[170px] scale-90 md:scale-95 opacity-60 translate-y-3 blur-[1px] -translate-x-1 md:-translate-x-3'
+                    : 'p-3 md:p-4 min-h-[150px] md:min-h-[170px] scale-90 md:scale-95 opacity-60 translate-y-3 blur-[1px] translate-x-1 md:translate-x-3'">
+                <div class="h-16 md:h-32 rounded-md bg-gray-900/60 mb-2">
+                  <img [src]="item.tire.image" alt="{{ item.tire.name }}" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-semibold text-lg md:text-lg text-white mb-1 md:mb-1.5 text-center md:text-left">
+                  {{ item.tire.name }}
+                </h3>
+                <p class="text-[16px] md:text-[16px] text-gray-300 leading-snug text-center md:text-left">
+                  {{ item.tire.description }}
+                </p>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Chevron derecho -->
+          <button type="button"
+            class="hidden md:inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-700/60 text-gray-200 hover:bg-gray-800 hover:border-gray-500 ml-2"
+            (click)="nextTopTire()">
+            <i class="material-symbols-outlined text-base">chevron_right</i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer / Contacto -->
+    <footer id="contacto" class="bg-[#020617] text-gray-300 text-xs md:text-sm mt-8">
+      <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+        <div>
+          <p class="font-medium text-md mb-2">Llantera de Occidente</p>
+
+          <p class="mb-0">
+            Av. Periodismo José Tocaven Lavín 2649,
+          </p>
+          <p class="mb-0">Col. Carlos María de Bustamante</p>
+          <p class="mb-0">C.P. 58197, Morelia, Michoacán, México.</p>
+          <p class="mb-1">Teléfonos: (443) 326 1312 · (443) 315 0340</p>
+          <p class="mb-1">Horarios: Lun - Vie 7:00 AM - 7:00 PM · Sáb 9:00 AM - 2:00 PM</p>
+          <p class="mb-1">Correo: contacto&#64;llanteradeoccidente.com.mx</p>
+        </div>
+
+        <div class="text-gray-400 flex-1 md:text-right items-end space-y-1">
+          <p>
+            <a href="#" class="hover:text-white underline underline-offset-2">Aviso de privacidad</a>
+            ·
+            <a href="#" class="hover:text-white underline underline-offset-2">Términos y condiciones</a>
+          </p>
+          <p> 2023. Llantera de Occidente AC. Todos los derechos reservados.</p>
+          <!-- <div class="flex md:justify-end gap-3 pt-2 text-lg">
+            <a href="#" aria-label="Facebook" class="hover:text-white">
+              <i class="material-symbols-outlined text-base">facebook</i>
+            </a>
+            <a href="#" aria-label="Instagram" class="hover:text-white">
+              <i class="material-symbols-outlined text-base">camera_alt</i>
+            </a>
+          </div> -->
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Botón flotante Cotizador -->
+  <button type="button"
+    class="fixed top-1/2 right-4 md:right-6 -translate-y-1/2 z-40 rounded-full bg-[#E60012] hover:bg-red-700 text-white shadow-xl shadow-[#E60012]/50 px-6 py-3.5 flex items-center gap-2 text-sm md:text-base font-semibold"
+    (click)="openCotizador()">
+    <i class="material-symbols-outlined text-lg md:text-xl">tune</i>
+    Cotizador
+  </button>
+
+  <!-- Sidebar Cotizador -->
+  @if (isCotizadorOpen()) {
+  <div class="fixed inset-0 z-50 flex justify-end">
+    <!-- Overlay clicable para cerrar -->
+    <div class="flex-1 bg-black/40 dark:bg-black/60" (click)="closeCotizador()"></div>
+
+    <!-- Panel derecho -->
+    <div
+      class="w-full max-w-md h-screen bg-white dark:bg-[#020617] shadow-3xl border-l border-gray-200 dark:border-[#172036] flex flex-col text-xs md:text-sm">
+      <!-- Header -->
+      <div class="flex items-start justify-between px-4 pt-4 pb-3 border-b border-gray-200 dark:border-[#172036]">
+        <div>
+          <h3 class="text-sm md:text-base font-semibold mb-1">Cotiza tus llantas</h3>
+          <p class="text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
+            Selecciona filtros básicos para encontrar llantas en el catálogo público. Los resultados se actualizan con
+            base en tus selecciones.
+          </p>
+        </div>
+        <button type="button" class="text-gray-500 dark:text-gray-400 hover:text-primary-500"
+          (click)="closeCotizador()">
+          <i class="material-symbols-outlined text-base">close</i>
+        </button>
+      </div>
+
+      <!-- Contenido: filtros + resultados -->
+      <form class="flex-1 flex flex-col" (submit)="onCotizadorSubmit($event)">
+        <!-- Filtros -->
+        <div class="px-4 pt-4 pb-3 space-y-3 border-b border-gray-200 dark:border-[#172036]">
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block mb-1 font-medium text-[11px]">Ancho</label>
+              <select name="ancho"
+                class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+                (change)="onCotizadorSelectChange('ancho', $any($event.target).value)">
+                <option value="" [selected]="cotizadorSelectedAncho() === null">Todos</option>
+                @for (a of cotizadorAnchos(); track a) {
+                <option [value]="a" [selected]="cotizadorSelectedAncho() === a">{{ a }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-[11px]">Perfil</label>
+              <select name="perfil"
+                class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+                (change)="onCotizadorSelectChange('perfil', $any($event.target).value)">
+                <option value="" [selected]="cotizadorSelectedPerfil() === null">Todos</option>
+                @for (p of cotizadorPerfiles(); track p) {
+                <option [value]="p" [selected]="cotizadorSelectedPerfil() === p">{{ p }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-[11px]">Rin</label>
+              <select name="rin"
+                class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+                (change)="onCotizadorSelectChange('rin', $any($event.target).value)">
+                <option value="" [selected]="cotizadorSelectedRin() === null">Todos</option>
+                @for (r of cotizadorRines(); track r) {
+                <option [value]="r" [selected]="cotizadorSelectedRin() === r">{{ r }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-[11px]">Construcción</label>
+              <select name="construccion"
+                class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+                (change)="onCotizadorSelectChange('construccion', $any($event.target).value)">
+                <option value="" [selected]="!cotizadorSelectedConstruccion()">Cualquiera</option>
+                @for (c of cotizadorConstrucciones(); track c) {
+                <option [value]="c" [selected]="cotizadorSelectedConstruccion() === c">{{ c }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-[11px]">Uso</label>
+              <select name="uso"
+                class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+                (change)="onCotizadorSelectChange('uso', $any($event.target).value)">
+                <option value="" [selected]="!cotizadorSelectedUso()">Cualquiera</option>
+                @for (u of cotizadorUsos(); track u) {
+                <option [value]="u" [selected]="cotizadorSelectedUso() === u">{{ u }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-[11px]">Índice de carga</label>
+              <select name="indiceCarga"
+                class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+                (change)="onCotizadorSelectChange('indiceCarga', $any($event.target).value)">
+                <option value="" [selected]="!cotizadorSelectedIndiceCarga()">Cualquiera</option>
+                @for (ic of cotizadorIndicesCarga(); track ic) {
+                <option [value]="ic" [selected]="cotizadorSelectedIndiceCarga() === ic">{{ ic }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block mb-1 font-medium text-[11px]">Cantidad</label>
+            <input type="number" name="cantidad" min="1" [value]="cotizadorCantidad()"
+              class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+              (input)="onCotizadorCantidadInput($event)" />
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[11px] text-gray-600 dark:text-gray-300">Solo llantas con existencia</span>
+            <label class="inline-flex items-center cursor-pointer">
+              <span class="relative inline-flex items-center">
+                <input type="checkbox" class="sr-only peer" [checked]="cotizadorOnlyInStock()"
+                  (change)="onCotizadorInStockToggle($any($event.target).checked)" />
+                <div class="w-9 h-5 rounded-full bg-gray-300 peer-checked:bg-emerald-500 transition-colors"></div>
+                <div
+                  class="absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transform transition-transform peer-checked:translate-x-4">
+                </div>
+              </span>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-end gap-2">
+            <button type="button"
+              class="px-3 py-1.5 rounded-md border border-gray-200 dark:border-[#172036] text-gray-700 dark:text-gray-300 text-[11px] md:text-xs hover:bg-gray-100 dark:hover:bg-[#111827]"
+              (click)="closeCotizador()">
+              Cerrar
+            </button>
+            <button type="submit"
+              class="px-3 py-1.5 rounded-md bg-primary-500 text-white text-[11px] md:text-xs font-medium hover:bg-primary-400"
+              [disabled]="cotizadorLoading()">
+              {{ cotizadorLoading() ? 'Buscando...' : 'Aplicar filtros' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Resultados con scroll automático -->
+        <div
+          class="flex-1 px-4 pb-4 pt-3 max-h-[55vh] overflow-y-auto text-[10px] md:text-xs text-gray-600 dark:text-gray-300">
+          @if (cotizadorLoading()) {
+          <p>Buscando llantas que coincidan con los filtros seleccionados...</p>
+          } @else if (cotizadorError()) {
+          <p class="text-danger-500">{{ cotizadorError() }}</p>
+          } @else if (!cotizadorResults().length) {
+          <p>
+            Configura los filtros y haz clic en
+            <span class="font-semibold">Aplicar filtros</span> para ver opciones de llantas.
+          </p>
+          } @else {
+          <div class="flex items-center justify-between mb-2">
+            <span>Resultados:</span>
+          </div>
+          <div class="space-y-2 ">
+            @for (item of cotizadorResults(); track item.tire.sku) {
+            <div
+              class="trezo-card bg-white dark:bg-[#0c1427] rounded-md border border-gray-200/80 dark:border-[#172036] px-3 py-2 flex flex-col gap-1">
+              <div class="flex items-center justify-between gap-2">
+                <div class="text-[11px] md:text-xs font-medium text-gray-900 dark:text-gray-100">
+                  {{ item.tire.medidaOriginal || (item.tire.ancho + '/' + (item.tire.perfil || '') + ' R' +
+                  item.tire.rin) }}
+                </div>
+                <div class="text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
+                  SKU: {{ item.tire.sku }}
+                </div>
+              </div>
+              <div class="text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
+                {{ item.tire.modelo }}
+              </div>
+              <div class="flex items-center justify-between text-[11px] md:text-xs text-gray-600 dark:text-gray-300">
+                <span>
+                  Carga/Vel: {{ item.tire.indiceCarga || 'N/D' }}/{{ item.tire.indiceVelocidad || 'N/D' }}
+                </span>
+                <span>Uso: {{ item.tire.abreviaturaUso || 'N/D' }}</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px] md:text-xs mt-1">
+                <span>
+                  Precio unitario:
+                  <span class="font-semibold">${{ item.price | number: '1.0-2' }}</span>
+                </span>
+                <span>
+                  Total aprox.:
+                  <span class="font-semibold">
+                    ${{ (item.price * cotizadorCantidad()) | number: '1.0-2' }}
+                  </span>
+                </span>
+              </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+  <!-- Modal Quiero ser cliente -->
+  @if (isClienteModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 modal-backdrop">
+    <div
+      class="bg-white dark:bg-[#020617] rounded-md shadow-3xl max-w-lg w-full mx-4 p-5 md:p-6 text-xs md:text-sm modal-content">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <h3 class="text-sm md:text-base font-semibold mb-1">
+            Quiero ser cliente
+          </h3>
+          <p class="text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
+            Déjanos tus datos y nos pondremos en contacto contigo para darte acceso al panel de clientes.
+          </p>
+        </div>
+        <button type="button" class="text-gray-500 dark:text-gray-400 hover:text-primary-500"
+          (click)="closeClienteModal()">
+          <i class="material-symbols-outlined text-base">close</i>
+        </button>
+      </div>
+
+      <form class="space-y-3" (submit)="onClienteFormSubmit($event)">
+        <div>
+          <label class="block mb-1 font-medium text-[11px]">Nombre completo</label>
+          <input type="text" name="fullName" required
+            class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+            placeholder="Ej. Juan Pérez López" />
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium text-[11px]">Solicitud</label>
+          <select name="requestType" required
+            class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs">
+            <option value="">Selecciona una opción</option>
+            <option value="distribuidor">Quiero ser distribuidor</option>
+            <option value="cliente">Quiero hacerme cliente</option>
+            <option value="cotizacion">Necesito cotización</option>
+            <option value="beneficios">Quiero más información sobre beneficios de clientes</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium text-[11px]">Mensaje</label>
+          <textarea rows="3" name="message"
+            class="w-full rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 py-1 text-xs resize-none"
+            placeholder="Cuéntanos brevemente qué necesitas"></textarea>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block mb-1 font-medium text-[11px]">Teléfono</label>
+            <input type="tel" name="phone" inputmode="numeric" autocomplete="tel" maxlength="10" pattern="^[0-9]{10}$"
+              title="Ingresa un número de 10 dígitos (solo números, sin espacios)."
+              class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+              placeholder="Ej. 4431234567" (input)="onPhoneInput($event)" />
+
+            <div class="flex items-center gap-3 mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+              <label class="inline-flex items-center gap-1">
+                <input type="radio" name="contactPreference" value="whatsapp" class="h-3 w-3" checked />
+                <span>WhatsApp</span>
+              </label>
+              <label class="inline-flex items-center gap-1">
+                <input type="radio" name="contactPreference" value="llamada" class="h-3 w-3" />
+                <span>Llamada</span>
+              </label>
+            </div>
+
+          </div>
+
+          <div>
+            <label class="block mb-1 font-medium text-[11px]">Correo electrónico</label>
+            <input type="email" name="email" inputmode="email" autocomplete="email"
+              class="w-full h-8 rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#020617] px-2 text-xs"
+              placeholder="tu@correo.com" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 mt-2">
+          <button type="button"
+            class="px-3 py-1.5 rounded-md border border-gray-200 dark:border-[#172036] text-gray-700 dark:text-gray-300 text-[11px] md:text-xs hover:bg-gray-100 dark:hover:bg-[#111827]"
+            (click)="closeClienteModal()">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-3 py-1.5 rounded-md bg-[#E60012] text-white text-[11px] md:text-xs font-medium hover:bg-red-700"
+            [disabled]="isSubmittingClienteRequest()">
+            {{ isSubmittingClienteRequest() ? 'Enviando...' : 'Enviar solicitud' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+  }
+  @if (showClienteSuccessToast()) {
+  <div class="fixed bottom-4 right-4 z-50">
+    <div
+      class="bg-white dark:bg-[#020617] border border-emerald-500/70 rounded-md shadow-lg px-4 py-3 flex items-start gap-3 text-xs md:text-sm text-gray-800 dark:text-gray-100">
+      <div class="mt-0.5">
+        <i class="material-symbols-outlined text-base text-emerald-500">check_circle</i>
+      </div>
+      <div>
+        <p class="font-medium text-[12px] md:text-sm">Solicitud enviada</p>
+        <p class="text-[11px] md:text-xs text-gray-600 dark:text-gray-300">
+          Gracias, recibimos tu información y nos pondremos en contacto contigo muy pronto.
+        </p>
+      </div>
+      <button type="button" class="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+        (click)="showClienteSuccessToast.set(false)">
+        <i class="material-symbols-outlined text-sm">close</i>
+      </button>
+    </div>
+  </div>
+  }
+</div>

@@ -1,0 +1,180 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    Usuarios / Clientes
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      <a routerLink="/dashboard" class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500">
+        <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2">
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      Usuarios
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      Usuarios / Clientes
+    </li>
+  </ol>
+</div>
+
+<div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+  <div class="trezo-card-header sm:flex items-center justify-between gap-[12px]">
+    <div class="trezo-card-title flex-1">
+      <form class="relative sm:w-[265px]" (submit)="$event.preventDefault()">
+        <label class="leading-none absolute ltr:left-[13px] rtl:right-[13px] text-black dark:text-white mt-px top-1/2 -translate-y-1/2">
+          <i class="material-symbols-outlined !text-[20px]">
+            search
+          </i>
+        </label>
+        <input
+          type="text"
+          name="search"
+          placeholder="Buscar usuario / cliente..."
+          class="bg-gray-50 border border-gray-50 h-[36px] text-xs rounded-md w-full block text-black pt-[11px] pb-[12px] ltr:pl-[38px] rtl:pr-[38px] ltr:pr-[13px] ltr:md:pr-[16px] rtl:pl-[13px] rtl:md:pl-[16px] placeholder:text-gray-500 outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c] dark:placeholder:text-gray-400"
+          [ngModel]="searchTerm()"
+          [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </form>
+    </div>
+    <div class="flex flex-wrap items-center gap-[10px] mt-[15px] sm:mt-0">
+      <div>
+        <label class="block text-[11px] mb-[3px] text-gray-500 dark:text-gray-400">
+          Tipo de usuario
+        </label>
+        <select
+          class="bg-gray-50 border border-gray-50 h-[32px] text-xs rounded-md min-w-[150px] text-black px-[10px] outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c]"
+          [ngModel]="roleFilter()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onRoleFilterChange($event)"
+        >
+          <option value="">Todos</option>
+          <option value="employee">Empleados</option>
+          <option value="customer">Clientes</option>
+          <option value="admin">Administradores</option>
+        </select>
+      </div>
+      <div class="trezo-card-subtitle">
+        <a
+          routerLink="/dashboard/usuarios/nuevo"
+          class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white"
+        >
+          <span class="inline-block relative ltr:pl-[22px] rtl:pr-[22px]">
+            <i
+              class="material-symbols-outlined !text-[22px] absolute ltr:-left-[4px] rtl:-right-[4px] top-1/2 -translate-y-1/2"
+            >
+              add
+            </i>
+            Nuevo usuario / cliente
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  @if (usuariosCount() > 0) {
+    <div class="mt-[18px] text-sm text-gray-500 dark:text-gray-400">
+      {{ usuariosCount() }} resultado{{ usuariosCount() === 1 ? '' : 's' }} encontrados
+    </div>
+  }
+</div>
+
+@if (loading()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="flex items-center gap-[12px] text-gray-500 dark:text-gray-400">
+      <span class="loading loading-spinner loading-md"></span>
+      Cargando usuarios...
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="text-danger-500 font-medium mb-[12px]">
+      {{ error() }}
+    </div>
+    <button type="button" (click)="retry()" class="px-[14px] py-[6px] rounded-md border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition-all">
+      Reintentar
+    </button>
+  </div>
+} @else if (usuariosCount() === 0) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px] text-center text-gray-500 dark:text-gray-400">
+    No se encontraron usuarios con el criterio proporcionado.
+  </div>
+} @else {
+  <div class="grid sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-[25px] mb-[25px]">
+    @for (usuario of usuarios(); track usuario.id) {
+      <div class="trezo-card bg-white dark:bg-[#0c1427] p-[20px] md:p-[25px] rounded-md">
+        <div class="trezo-card-content">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center">
+              <div class="rounded-full w-[55px] h-[55px] bg-gray-100 dark:bg-[#172036] flex items-center justify-center text-primary-500 font-semibold uppercase">
+                {{ formatNombre(usuario)[0] }}
+              </div>
+              <div class="ltr:ml-[12px] rtl:mr-[12px]">
+                <span class="block text-md mb-[2px] font-medium text-black dark:text-white">
+                  {{ formatNombre(usuario) }}
+                </span>
+                <span class="block text-xs text-gray-500 dark:text-gray-400">
+                  {{ usuario.email }}
+                </span>
+              </div>
+            </div>
+            <span class="inline-flex items-center rounded-full text-xs px-[10px] py-[3px]"
+              [ngClass]="usuario.active ? 'text-success-500 bg-success-50' : 'text-warning-500 bg-warning-50'">
+              {{ usuario.active ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <ul class="mt-[17px] text-sm space-y-[6px]">
+            <li>
+              <span class="text-black dark:text-white">Empresa:</span>
+              {{ getCompanyLabel(usuario.companyId) }}
+            </li>
+            <li>
+              <span class="text-black dark:text-white">Teléfono:</span>
+              {{ usuario.phone || 'Sin teléfono' }}
+            </li>
+            <li>
+              <span class="text-black dark:text-white">Rol:</span>
+              {{ formatRole(usuario) }}
+            </li>
+            <li>
+              <span class="text-black dark:text-white">Nivel:</span>
+              {{ formatNivel(usuario) }}
+            </li>
+          </ul>
+
+          <div class="flex items-center gap-[9px] mt-[15px]">
+            <button
+              type="button"
+              class="text-primary-500 leading-none hover:opacity-80 transition"
+              title="Ver detalle"
+              (click)="onViewUsuario(usuario.id)"
+            >
+              <i class="material-symbols-outlined !text-md">visibility</i>
+            </button>
+            <button
+              type="button"
+              class="text-gray-500 dark:text-gray-400 leading-none hover:text-primary-500 transition"
+              title="Editar"
+              (click)="onEditUsuario(usuario.id)"
+            >
+              <i class="material-symbols-outlined !text-md">edit</i>
+            </button>
+            <button
+              type="button"
+              class="text-danger-500 leading-none hover:opacity-80 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              title="Eliminar"
+              [disabled]="deletingId() === usuario.id"
+              (click)="onDeleteUsuario(usuario)"
+            >
+              <i class="material-symbols-outlined !text-md">delete</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

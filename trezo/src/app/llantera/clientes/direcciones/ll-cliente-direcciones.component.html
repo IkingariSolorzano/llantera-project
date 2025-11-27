@@ -1,0 +1,226 @@
+<div class="space-y-6">
+  <!-- Mensajes -->
+  @if (success()) {
+    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 flex items-center gap-3">
+      <i class="material-symbols-outlined text-green-500">check_circle</i>
+      <span class="text-sm text-green-700 dark:text-green-400">{{ success() }}</span>
+    </div>
+  }
+  @if (error()) {
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-center gap-3">
+      <i class="material-symbols-outlined text-red-500">error</i>
+      <span class="text-sm text-red-700 dark:text-red-400">{{ error() }}</span>
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Mis direcciones</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Administra tus direcciones de envío</p>
+    </div>
+    @if (!showForm()) {
+      <button
+        type="button"
+        (click)="openNewForm()"
+        class="h-10 px-4 bg-[#E60012] hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+      >
+        <i class="material-symbols-outlined !text-[18px]">add</i>
+        Nueva dirección
+      </button>
+    }
+  </div>
+
+  <!-- Formulario -->
+  @if (showForm()) {
+    <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-[#172036] flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          {{ editingId() ? 'Editar dirección' : 'Nueva dirección' }}
+        </h3>
+        <button type="button" (click)="closeForm()" class="text-gray-400 hover:text-gray-600">
+          <i class="material-symbols-outlined">close</i>
+        </button>
+      </div>
+
+      <form [formGroup]="addressForm" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Alias -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Alias *</label>
+            <input type="text" formControlName="alias" placeholder="Ej: Casa, Oficina"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+              [class.border-red-500]="isInvalid('alias')" />
+          </div>
+
+          <!-- Calle -->
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Calle *</label>
+            <input type="text" formControlName="street" placeholder="Nombre de la calle"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+              [class.border-red-500]="isInvalid('street')" />
+          </div>
+
+          <!-- Número exterior -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Número exterior *</label>
+            <input type="text" formControlName="exteriorNumber" placeholder="#"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+              [class.border-red-500]="isInvalid('exteriorNumber')" />
+          </div>
+
+          <!-- Número interior -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Número interior</label>
+            <input type="text" formControlName="interiorNumber" placeholder="Opcional"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none" />
+          </div>
+
+          <!-- Colonia -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Colonia *</label>
+            <input type="text" formControlName="neighborhood" placeholder="Colonia"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+              [class.border-red-500]="isInvalid('neighborhood')" />
+          </div>
+
+          <!-- Código Postal -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Código Postal *</label>
+            <input type="text" formControlName="postalCode" placeholder="5 dígitos" maxlength="5"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+              [class.border-red-500]="isInvalid('postalCode')" />
+          </div>
+
+          <!-- Ciudad -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Ciudad *</label>
+            <input type="text" formControlName="city" placeholder="Ciudad"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+              [class.border-red-500]="isInvalid('city')" />
+          </div>
+
+          <!-- Estado -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Estado *</label>
+            <select formControlName="state"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+              [class.border-red-500]="isInvalid('state')">
+              <option value="">Seleccionar...</option>
+              @for (estado of estadosMexico; track estado) {
+                <option [value]="estado">{{ estado }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Teléfono -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Teléfono *</label>
+            <input type="tel" formControlName="phone" placeholder="10 dígitos" maxlength="10"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+              [class.border-red-500]="isInvalid('phone')" />
+          </div>
+
+          <!-- Referencias -->
+          <div class="sm:col-span-2 lg:col-span-3">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Referencias</label>
+            <input type="text" formControlName="reference" placeholder="Ej: Frente al parque, casa color azul"
+              class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none" />
+          </div>
+
+          <!-- Default -->
+          <div class="sm:col-span-2 lg:col-span-3 flex items-center gap-2">
+            <input type="checkbox" formControlName="isDefault" id="isDefault"
+              class="w-4 h-4 rounded border-gray-300 text-[#E60012] focus:ring-[#E60012]" />
+            <label for="isDefault" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+              Establecer como dirección predeterminada
+            </label>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-[#172036]">
+          <button type="button" (click)="closeForm()"
+            class="h-10 px-4 border border-gray-300 dark:border-[#172036] text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-[#15203c] transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="loading()"
+            class="h-10 px-6 bg-[#E60012] hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50">
+            @if (loading()) {
+              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            }
+            {{ editingId() ? 'Guardar cambios' : 'Agregar dirección' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Lista de direcciones -->
+  @if (!showForm()) {
+    @if (direcciones().length === 0) {
+      <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-12 text-center">
+        <i class="material-symbols-outlined !text-[64px] text-gray-300 dark:text-gray-600 mb-4">location_off</i>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No tienes direcciones guardadas</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Agrega una dirección de envío para tus pedidos</p>
+        <button type="button" (click)="openNewForm()"
+          class="h-10 px-4 bg-[#E60012] hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-2">
+          <i class="material-symbols-outlined !text-[18px]">add</i>
+          Agregar dirección
+        </button>
+      </div>
+    } @else {
+      <div class="grid gap-4">
+        @for (dir of direcciones(); track dir.id) {
+          <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-5"
+               [class.ring-2]="dir.isDefault" [class.ring-[#E60012]]="dir.isDefault">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="font-semibold text-gray-900 dark:text-white">{{ dir.alias }}</span>
+                  @if (dir.isDefault) {
+                    <span class="px-2 py-0.5 bg-[#E60012] text-white text-[10px] font-medium rounded">
+                      Predeterminada
+                    </span>
+                  }
+                </div>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDireccion(dir) }}</p>
+                @if (dir.reference) {
+                  <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                    <i class="material-symbols-outlined !text-[14px] align-middle mr-1">info</i>
+                    {{ dir.reference }}
+                  </p>
+                }
+                <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                  <i class="material-symbols-outlined !text-[14px] align-middle mr-1">phone</i>
+                  {{ dir.phone }}
+                </p>
+              </div>
+              <div class="flex items-center gap-1">
+                @if (!dir.isDefault) {
+                  <button type="button" (click)="setAsDefault(dir.id)"
+                    class="p-2 text-gray-400 hover:text-[#E60012] hover:bg-gray-100 dark:hover:bg-[#15203c] rounded-lg transition-colors"
+                    title="Establecer como predeterminada">
+                    <i class="material-symbols-outlined !text-[20px]">star</i>
+                  </button>
+                }
+                <button type="button" (click)="openEditForm(dir)"
+                  class="p-2 text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-[#15203c] rounded-lg transition-colors"
+                  title="Editar">
+                  <i class="material-symbols-outlined !text-[20px]">edit</i>
+                </button>
+                <button type="button" (click)="deleteDireccion(dir.id)"
+                  class="p-2 text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-[#15203c] rounded-lg transition-colors"
+                  title="Eliminar">
+                  <i class="material-symbols-outlined !text-[20px]">delete</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

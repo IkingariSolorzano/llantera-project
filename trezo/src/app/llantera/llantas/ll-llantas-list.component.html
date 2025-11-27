@@ -1,0 +1,563 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    Llantas
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0"
+    >
+      <a
+        routerLink="/dashboard"
+        class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500"
+      >
+        <i
+          class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2"
+        >
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0"
+    >
+      Llantas
+    </li>
+  </ol>
+</div>
+
+<div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+  <div class="trezo-card-header sm:flex items-center justify-between">
+    <div class="trezo-card-title">
+      <form class="relative sm:w-[265px]" (submit)="$event.preventDefault()">
+        <label
+          class="leading-none absolute ltr:left-[13px] rtl:right-[13px] text-black dark:text-white mt-px top-1/2 -translate-y-1/2"
+        >
+          <i class="material-symbols-outlined !text-[20px]">
+            search
+          </i>
+        </label>
+        <input
+          type="text"
+          name="search"
+          placeholder="Buscar llanta por SKU, medida o descripción..."
+          class="bg-gray-50 border border-gray-50 h-[36px] text-xs rounded-md w-full block text-black pt-[11px] pb-[12px] ltr:pl-[38px] rtl:pr-[38px] ltr:pr-[13px] ltr:md:pr-[16px] rtl:pl-[13px] rtl:md:pl-[16px] placeholder:text-gray-500 outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c] dark:placeholder:text-gray-400"
+          [ngModel]="searchTerm()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </form>
+    </div>
+    <div class="trezo-card-subtitle mt-[15px] sm:mt-0 flex items-center gap-[10px] justify-end">
+      <a
+        routerLink="/dashboard/llantas/nueva"
+        class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] bg-primary-500 text-white hover:bg-primary-600"
+      >
+        <span class="inline-block relative ltr:pl-[22px] rtl:pr-[22px]">
+          <i
+            class="material-symbols-outlined !text-[22px] absolute ltr:-left-[4px] rtl:-right-[4px] top-1/2 -translate-y-1/2"
+          >
+            add
+          </i>
+          Nueva llanta
+        </span>
+      </a>
+      <button
+        type="button"
+        class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white"
+        (click)="downloadCatalog()"
+      >
+        <span class="inline-block relative ltr:pl-[22px] rtl:pr-[22px]">
+          <i
+            class="material-symbols-outlined !text-[22px] absolute ltr:-left-[4px] rtl:-right-[4px] top-1/2 -translate-y-1/2"
+          >
+            download
+          </i>
+          Descargar catálogo
+        </span>
+      </button>
+      <label
+        class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white cursor-pointer"
+      >
+        <span class="inline-block relative ltr:pl-[22px] rtl:pr-[22px]">
+          <i
+            class="material-symbols-outlined !text-[22px] absolute ltr:-left-[4px] rtl:-right-[4px] top-1/2 -translate-y-1/2"
+          >
+            upload
+          </i>
+          Cargar archivo
+        </span>
+        <input type="file" accept=".xlsx,.xls" class="hidden" (change)="onInventoryFileSelected($event)" />
+      </label>
+      <a
+        routerLink="/dashboard/llantas/precios"
+        class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white"
+      >
+        <span class="inline-block relative ltr:pl-[22px] rtl:pr-[22px]">
+          <i
+            class="material-symbols-outlined !text-[22px] absolute ltr:-left-[4px] rtl:-right-[4px] top-1/2 -translate-y-1/2"
+          >
+            tune
+          </i>
+          Configurar precios
+        </span>
+      </a>
+      <a
+        routerLink="/dashboard/llantas/catalogo-publico"
+        class="inline-block transition-all rounded-md font-medium px-[13px] py-[6px] text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white"
+      >
+        <span class="inline-block relative ltr:pl-[22px] rtl:pr-[22px]">
+          <i
+            class="material-symbols-outlined !text-[22px] absolute ltr:-left-[4px] rtl:-right-[4px] top-1/2 -translate-y-1/2"
+          >
+            visibility
+          </i>
+          Ver catálogo público
+        </span>
+      </a>
+    </div>
+  </div>
+
+  @if (totalTires() > 0) {
+    <div class="mt-[18px] text-sm text-gray-500 dark:text-gray-400">
+      {{ totalTires() }} resultado{{ totalTires() === 1 ? '' : 's' }} encontrados
+    </div>
+  }
+</div>
+
+@if (loading()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="flex items-center gap-[12px] text-gray-500 dark:text-gray-400">
+      <span class="loading loading-spinner loading-md"></span>
+      Cargando llantas...
+    </div>
+  </div>
+} @else if (error()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px]">
+    <div class="text-danger-500 font-medium mb-[12px]">
+      {{ error() }}
+    </div>
+    <button
+      type="button"
+      (click)="retry()"
+      class="px-[14px] py-[6px] rounded-md border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition-all"
+    >
+      Reintentar
+    </button>
+  </div>
+} @else if (totalTires() === 0) {
+  <div
+    class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md mb-[25px] text-center text-gray-500 dark:text-gray-400"
+  >
+    No se encontraron llantas con el criterio proporcionado.
+  </div>
+} @else {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[16px] md:p-[20px] rounded-md">
+    <div class="trezo-card-content">
+      <div class="table-responsive overflow-x-auto max-h-[750px] overflow-y-auto">
+        <table class="w-full">
+          <thead class="text-black dark:text-white sticky top-0 z-20">
+            <tr>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap ltr:first:rounded-tl-md ltr:last:rounded-tr-md rtl:first:rounded-tr-md rtl:last:rounded-tl-md sticky left-0 z-30 w-[110px]"
+              >
+                SKU
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap sticky left-[110px] z-30 w-[120px]"
+              >
+                Medida
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[80px]"
+              >
+                Ancho
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[80px]"
+              >
+                Perfil
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[80px]"
+              >
+                Radial
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[150px]"
+              >
+                Marca
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[100px]"
+              >
+                Uso
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[100px]"
+              >
+                Cantidad
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[110px]"
+              >
+                Precio público
+              </th>
+              @for (code of priceColumns(); track code) {
+                <th
+                  class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[110px]"
+                >
+                  {{ code | uppercase }}
+                </th>
+              }
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap w-[130px]"
+              >
+                Actualizado
+              </th>
+              <th
+                class="font-medium ltr:text-left rtl:text-right px-[10px] py-[8px] bg-gray-50 dark:bg-[#15203c] whitespace-nowrap ltr:first:rounded-tr-md ltr:last:rounded-tr-md rtl:first:rounded-tr-md rtl:last:rounded-tl-md w-[110px]"
+              >
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="text-black dark:text-white">
+            @for (item of adminItems(); track item.tire.id) {
+              @let tire = item.tire;
+              <tr
+                class="cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-[#15203c]"
+                (dblclick)="onRowDblClick(tire)"
+              >
+                <td
+                  class="text-gray-500 dark:text-gray-400 ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l sticky left-0 z-20 bg-white dark:bg-[#0c1427] w-[110px]"
+                >
+                  {{ tire.sku }}
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l sticky left-[110px] z-20 bg-white dark:bg-[#0c1427] w-[120px]"
+                >
+                  <div class="text-sm font-medium">
+                    {{ formatMedida(tire) }}
+                  </div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400 mt-[2px]">
+                    Modelo: {{ tire.modelo }} · Carga/Vel: {{ tire.indiceCarga }}/{{ tire.indiceVelocidad }}
+                  </div>
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[80px]"
+                >
+                  {{ tire.ancho }}
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[80px]"
+                >
+                  {{ tire.perfil ?? '-' }}
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[80px]"
+                >
+                  {{ formatRadial(tire) }}
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[150px]"
+                >
+                  {{ getBrandName(tire.marcaId) }}
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[100px]"
+                >
+                  {{ tire.abreviaturaUso }}
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[100px]"
+                >
+                  @if (editingSku() === tire.sku) {
+                    <input
+                      #cantidadInput
+                      type="number"
+                      class="w-[80px] bg-gray-50 border border-gray-200 rounded-md px-[6px] py-[3px] text-xs dark:bg-[#15203c] dark:border-[#172036]"
+                      [ngModel]="editBuffer()?.cantidad ?? null"
+                      [ngModelOptions]="{ standalone: true }"
+                      (ngModelChange)="updateEditCantidad($event)"
+                      (keyup.enter)="onEnterEdit(tire)"
+                      (keyup.escape)="onEscapeEdit()"
+                    />
+                  } @else {
+                    {{ item.inventory?.cantidad ?? 0 }}
+                  }
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[110px]"
+                >
+                  ${{ tire.precioPublico | number: '1.0-2' }}
+                </td>
+                @for (code of priceColumns(); track code) {
+                  <td
+                    class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[110px]"
+                  >
+                    @if (editingSku() === tire.sku) {
+                      <input
+                        type="number"
+                        class="w-[80px] bg-gray-50 border border-gray-200 rounded-md px-[6px] py-[3px] text-xs dark:bg-[#15203c] dark:border-[#172036]"
+                        [ngModel]="editBuffer()?.precios?.[code] ?? null"
+                        [ngModelOptions]="{ standalone: true }"
+                        (ngModelChange)="updateEditPrice(code, $event)"
+                        (keyup.enter)="onEnterEdit(tire)"
+                        (keyup.escape)="onEscapeEdit()"
+                      />
+                    } @else {
+                      {{ item.prices?.[code] ?? '-' }}
+                    }
+                  </td>
+                }
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[130px]"
+                >
+                  {{ tire.actualizadoEn | date: 'short' }}
+                </td>
+                <td
+                  class="ltr:text-left rtl:text-right whitespace-nowrap px-[10px] py-[9px] border-b border-gray-100 dark:border-[#172036] ltr:first:border-l ltr:last:border-r rtl:first:border-r rtl:last:border-l w-[110px]"
+                >
+                  <div class="flex items-center gap-[9px]">
+                    @if (editingSku() === tire.sku) {
+                      <button
+                        type="button"
+                        class="text-success-500 leading-none hover:opacity-80 transition"
+                        title="Guardar cambios"
+                        (click)="saveEdit(tire)"
+                      >
+                        <i class="material-symbols-outlined !text-md">save</i>
+                      </button>
+                      <button
+                        type="button"
+                        class="text-danger-500 leading-none hover:opacity-80 transition"
+                        title="Cancelar"
+                        (click)="cancelEdit()"
+                      >
+                        <i class="material-symbols-outlined !text-md">close</i>
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="text-primary-500 leading-none hover:opacity-80 transition"
+                        title="Editar precios en línea"
+                        (click)="onEditTire(tire)"
+                      >
+                        <i class="material-symbols-outlined !text-md">payments</i>
+                      </button>
+                      <button
+                        type="button"
+                        class="text-gray-500 dark:text-gray-400 leading-none hover:text-primary-500 transition"
+                        title="Editar llanta en formulario"
+                        (click)="onOpenTireForm(tire)"
+                      >
+                        <i class="material-symbols-outlined !text-md">edit</i>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div
+        class="mt-[15px] flex flex-col md:flex-row md:items-center md:justify-between gap-[10px] text-xs md:text-sm text-gray-500 dark:text-gray-400"
+      >
+        <div class="flex items-center gap-[8px]">
+          <span>Mostrar</span>
+          <select
+            class="bg-gray-50 border border-gray-200 rounded-md px-[8px] py-[4px] dark:bg-[#15203c] dark:border-[#172036]"
+            [ngModel]="pageSize()"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="changePageSize($event)"
+          >
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="25">25</option>
+            <option [ngValue]="50">50</option>
+            <option [ngValue]="100">100</option>
+          </select>
+          <span>registros por página</span>
+        </div>
+
+        <div class="flex items-center gap-[12px] justify-between md:justify-end">
+          <span>
+            Página {{ pageIndex() + 1 }} de {{ totalPages() }}
+            · Total {{ totalTires() }} registros
+          </span>
+
+          <div class="inline-flex items-center gap-[4px]">
+            <button
+              type="button"
+              class="w-[28px] h-[28px] flex items-center justify-center rounded-md border border-gray-200 text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 dark:border-[#172036] dark:text-gray-300 dark:hover:bg-[#15203c]"
+              [disabled]="pageIndex() === 0"
+              (click)="prevPage()"
+            >
+              <i class="material-symbols-outlined !text-[18px]">chevron_left</i>
+            </button>
+
+            @for (btn of pageButtons(); track btn.label + '-' + btn.type) {
+              @if (btn.type === 'page') {
+                <button
+                  type="button"
+                  class="min-w-[28px] h-[28px] px-[6px] flex items-center justify-center rounded-md border text-xs"
+                  [ngClass]="{
+                    'bg-primary-500 text-white border-primary-500': btn.index === pageIndex(),
+                    'border-gray-200 text-gray-600 hover:bg-gray-100 dark:border-[#172036] dark:text-gray-300 dark:hover:bg-[#15203c]':
+                      btn.index !== pageIndex(),
+                  }"
+                  (click)="goToPage(btn.index!)"
+                >
+                  {{ btn.label }}
+                </button>
+              } @else {
+                <span class="min-w-[28px] h-[28px] px-[6px] flex items-center justify-center text-xs text-gray-400">
+                  {{ btn.label }}
+                </span>
+              }
+            }
+
+            <button
+              type="button"
+              class="w-[28px] h-[28px] flex items-center justify-center rounded-md border border-gray-200 text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 dark:border-[#172036] dark:text-gray-300 dark:hover:bg-[#15203c]"
+              [disabled]="pageIndex() >= totalPages() - 1"
+              (click)="nextPage()"
+            >
+              <i class="material-symbols-outlined !text-[18px]">chevron_right</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de progreso de importación de catálogo -->
+@if (isImporting()) {
+  <div
+    class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 dark:bg-black/60"
+  >
+    <div class="bg-white dark:bg-[#0c1427] rounded-md shadow-lg max-w-sm w-full mx-[16px] p-[20px] flex flex-col items-start">
+      <h5 class="mb-[8px] text-[15px] md:text-[16px] font-semibold">
+        Importando catálogo de llantas
+      </h5>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-[14px]">
+        Estamos procesando el archivo. Este proceso puede tardar varios segundos dependiendo del tamaño del catálogo.
+      </p>
+      <div class="w-full mb-[6px]">
+        <div class="w-full bg-gray-100 dark:bg-[#15203c] rounded-full h-[4px] overflow-hidden">
+          <div
+            class="h-full bg-primary-500 transition-[width] duration-200 ease-out"
+            [style.width.%]="importProgress()"
+          ></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-[8px] mt-[8px] text-xs text-gray-500 dark:text-gray-400">
+        <span class="loading loading-spinner loading-sm"></span>
+        <span>No cierres esta ventana hasta que termine la importación.</span>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de resultado de importación de catálogo -->
+@if (showImportResult()) {
+  <div
+    class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 dark:bg-black/60"
+  >
+    <div class="bg-white dark:bg-[#0c1427] rounded-md shadow-lg max-w-sm w-full mx-[16px] p-[20px]">
+      <h5 class="mb-[8px] text-[15px] md:text-[16px] font-semibold text-success-500">
+        Importación completada
+      </h5>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-[12px]">
+        Se procesaron
+        <span class="font-semibold">{{ importResultProcessed() ?? 0 }}</span>
+        llanta{{ (importResultProcessed() ?? 0) === 1 ? '' : 's' }} desde el archivo cargado.
+      </p>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mb-[16px]">
+        Puedes revisar los cambios en la tabla de llantas. Si modificaste muchas filas, puede que tarden unos segundos en reflejarse todos los recálculos de precios derivados.
+      </p>
+      <div class="flex items-center justify-end gap-[10px]">
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md bg-primary-500 text-white text-xs md:text-sm font-medium hover:bg-primary-600 transition-all"
+          (click)="closeImportResult()"
+        >
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de confirmación de importación de catálogo -->
+@if (showImportConfirm()) {
+  <div
+    class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 dark:bg-black/60"
+  >
+    <div class="bg-white dark:bg-[#0c1427] rounded-md shadow-lg max-w-sm w-full mx-[16px] p-[20px]">
+      <h5 class="mb-[8px] text-[15px] md:text-[16px] font-semibold">
+        Confirmar importación
+      </h5>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-[16px]">
+        Se importará el archivo
+        <span class="font-semibold">{{ importFileName() || 'seleccionado' }}</span>
+        y se actualizará el catálogo de llantas (existentes y nuevas).
+        <br />
+        ¿Deseas continuar?
+      </p>
+      <div class="flex items-center justify-end gap-[10px]">
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md border border-gray-200 text-gray-700 dark:text-gray-300 dark:border-[#172036] text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-[#15203c] transition-all"
+          (click)="cancelImport()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md bg-primary-500 text-white text-xs md:text-sm font-medium hover:bg-primary-600 transition-all"
+          (click)="confirmImport()"
+        >
+          Sí, importar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de confirmación (tipo sweet alert ligero) para guardar cambios de edición en línea -->
+@if (confirmEditTire()) {
+  <div
+    class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 dark:bg-black/60"
+  >
+    <div class="bg-white dark:bg-[#0c1427] rounded-md shadow-lg max-w-sm w-full mx-[16px] p-[20px]">
+      <h5 class="mb-[8px] text-[15px] md:text-[16px] font-semibold">
+        Confirmar guardado
+      </h5>
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-[16px]">
+        ¿Deseas guardar los cambios para la llanta
+        <span class="font-semibold">{{ confirmEditTire()?.sku }}</span>?
+      </p>
+      <div class="flex items-center justify-end gap-[10px]">
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md border border-gray-200 text-gray-700 dark:text-gray-300 dark:border-[#172036] text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-[#15203c] transition-all"
+          (click)="cancelConfirm()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="px-[12px] py-[6px] rounded-md bg-primary-500 text-white text-xs md:text-sm font-medium hover:bg-primary-600 transition-all"
+          (click)="confirmSave()"
+        >
+          Sí, guardar
+        </button>
+      </div>
+    </div>
+  </div>
+}

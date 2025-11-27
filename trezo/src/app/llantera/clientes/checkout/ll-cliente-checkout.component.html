@@ -1,0 +1,524 @@
+<div class="min-h-screen bg-gray-50 dark:bg-[#020617]">
+  <!-- Header -->
+  <header class="bg-white dark:bg-[#0c1427] border-b border-gray-200 dark:border-[#172036] sticky top-0 z-40">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button type="button" (click)="cancelarCheckout()" class="p-2 hover:bg-gray-100 dark:hover:bg-[#15203c] rounded-lg transition-colors">
+          <i class="material-symbols-outlined !text-[20px] text-gray-600 dark:text-gray-300">arrow_back</i>
+        </button>
+        <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Finalizar compra</h1>
+      </div>
+      <div class="text-sm text-gray-500">
+        {{ cart.itemCount() }} productos · ${{ formatPrice(cart.subtotal()) }}
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-6">
+    <!-- Stepper -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        @for (step of ['direccion', 'facturacion', 'pago', 'confirmacion']; track step; let i = $index) {
+          <div class="flex-1 flex items-center">
+            <button
+              type="button"
+              class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all"
+              [ngClass]="{
+                'bg-[#E60012] text-white': currentStep() === step,
+                'bg-green-500 text-white': ['direccion', 'facturacion', 'pago', 'confirmacion'].indexOf(currentStep()) > i,
+                'bg-gray-200 dark:bg-[#172036] text-gray-500': ['direccion', 'facturacion', 'pago', 'confirmacion'].indexOf(currentStep()) < i
+              }"
+            >
+              @if (['direccion', 'facturacion', 'pago', 'confirmacion'].indexOf(currentStep()) > i) {
+                <i class="material-symbols-outlined !text-[16px]">check</i>
+              } @else {
+                {{ i + 1 }}
+              }
+            </button>
+            @if (i < 3) {
+              <div class="flex-1 h-0.5 mx-2"
+                [ngClass]="['direccion', 'facturacion', 'pago', 'confirmacion'].indexOf(currentStep()) > i ? 'bg-green-500' : 'bg-gray-200 dark:bg-[#172036]'">
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+        <span>Dirección</span>
+        <span>Facturación</span>
+        <span>Pago</span>
+        <span>Confirmar</span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-center gap-3">
+        <i class="material-symbols-outlined text-red-500">error</i>
+        <span class="text-sm text-red-700 dark:text-red-400">{{ error() }}</span>
+      </div>
+    }
+
+    <!-- Paso 1: Dirección -->
+    @if (currentStep() === 'direccion') {
+      <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <i class="material-symbols-outlined text-[#E60012]">location_on</i>
+          Dirección de envío
+        </h2>
+
+        @if (loadingAddresses()) {
+          <div class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E60012]"></div>
+          </div>
+        }
+
+        @if (!loadingAddresses() && direcciones().length > 0 && !showNewAddressForm()) {
+          <div class="space-y-3 mb-4">
+            @for (dir of direcciones(); track dir.id) {
+              <button
+                type="button"
+                (click)="selectDireccion(dir.id)"
+                class="w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4"
+                [ngClass]="selectedDireccionId() === dir.id
+                  ? 'border-[#E60012] bg-red-50 dark:bg-red-900/10'
+                  : 'border-gray-200 dark:border-[#172036] hover:border-gray-300'"
+              >
+                <div class="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center"
+                  [ngClass]="dir.isDefault ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-gray-100 dark:bg-gray-800'">
+                  <i class="material-symbols-outlined" [ngClass]="dir.isDefault ? 'text-amber-600' : 'text-gray-600'">
+                    {{ dir.isDefault ? 'star' : 'home' }}
+                  </i>
+                </div>
+                <div class="flex-1 text-left min-w-0">
+                  <div class="flex items-center gap-2">
+                    <p class="font-medium text-gray-900 dark:text-white">{{ dir.alias }}</p>
+                    @if (dir.isDefault) {
+                      <span class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
+                        Predeterminada
+                      </span>
+                    }
+                  </div>
+                  <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 truncate">{{ formatDireccion(dir) }}</p>
+                  <p class="text-sm text-gray-500 mt-0.5">Tel: {{ dir.phone }}</p>
+                </div>
+                @if (selectedDireccionId() === dir.id) {
+                  <i class="material-symbols-outlined text-[#E60012] flex-shrink-0">check_circle</i>
+                }
+              </button>
+            }
+          </div>
+        }
+        
+        @if (!loadingAddresses() && direcciones().length === 0 && !showNewAddressForm()) {
+          <div class="text-center py-6 mb-4">
+            <i class="material-symbols-outlined !text-[48px] text-gray-300 dark:text-gray-600">location_off</i>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">No tienes direcciones registradas</p>
+          </div>
+        }
+
+        <button
+          type="button"
+          (click)="toggleNewAddressForm()"
+          class="w-full p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-[#172036] hover:border-[#E60012] text-gray-600 dark:text-gray-400 hover:text-[#E60012] transition-all flex items-center justify-center gap-2"
+        >
+          <i class="material-symbols-outlined">add</i>
+          {{ showNewAddressForm() ? 'Cancelar' : 'Agregar nueva dirección' }}
+        </button>
+
+        @if (showNewAddressForm()) {
+          <form [formGroup]="addressForm" class="mt-4 space-y-4">
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Alias *</label>
+                <input type="text" formControlName="alias" placeholder="Ej: Casa, Oficina"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isAddressInvalid('alias')" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teléfono *</label>
+                <input type="tel" formControlName="telefono" placeholder="10 dígitos" maxlength="10"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isAddressInvalid('telefono')" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Calle *</label>
+                <input type="text" formControlName="calle"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isAddressInvalid('calle')" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número ext. *</label>
+                <input type="text" formControlName="numeroExterior"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isAddressInvalid('numeroExterior')" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número int.</label>
+                <input type="text" formControlName="numeroInterior"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Colonia *</label>
+                <input type="text" formControlName="colonia"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isAddressInvalid('colonia')" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">C.P. *</label>
+                <input type="text" formControlName="codigoPostal" maxlength="5"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isAddressInvalid('codigoPostal')" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ciudad *</label>
+                <input type="text" formControlName="ciudad"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isAddressInvalid('ciudad')" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estado *</label>
+                <select formControlName="estado"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isAddressInvalid('estado')">
+                  <option value="">Seleccionar...</option>
+                  @for (estado of estadosMexico; track estado) {
+                    <option [value]="estado">{{ estado }}</option>
+                  }
+                </select>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Referencias</label>
+                <input type="text" formControlName="referencias" placeholder="Ej: Frente al parque"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm" />
+              </div>
+            </div>
+          </form>
+        }
+      </div>
+    }
+
+    <!-- Paso 2: Facturación -->
+    @if (currentStep() === 'facturacion') {
+      <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <i class="material-symbols-outlined text-[#E60012]">receipt_long</i>
+          Datos de facturación
+        </h2>
+
+        <form [formGroup]="invoiceForm" class="space-y-4">
+          <div class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-[#0a0f1a] rounded-xl">
+            <input type="checkbox" formControlName="requiereFactura" id="requiereFactura"
+              class="w-5 h-5 rounded border-gray-300 text-[#E60012] focus:ring-[#E60012]" />
+            <label for="requiereFactura" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+              Requiero factura para esta compra
+            </label>
+          </div>
+
+          @if (invoiceForm.value.requiereFactura) {
+            <div class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-[#172036]">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">RFC *</label>
+                <input type="text" formControlName="rfc" placeholder="XAXX010101000" maxlength="13"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm uppercase"
+                  [class.border-red-500]="isInvoiceInvalid('rfc')" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">C.P. Fiscal *</label>
+                <input type="text" formControlName="codigoPostalFiscal" maxlength="5"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isInvoiceInvalid('codigoPostalFiscal')" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Razón Social *</label>
+                <input type="text" formControlName="razonSocial"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm"
+                  [class.border-red-500]="isInvoiceInvalid('razonSocial')" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Régimen Fiscal *</label>
+                <select formControlName="regimenFiscal"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm">
+                  <option value="">Seleccionar...</option>
+                  @for (regimen of regimenesFiscales; track regimen.codigo) {
+                    <option [value]="regimen.codigo">{{ regimen.codigo }} - {{ regimen.nombre }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Uso de CFDI *</label>
+                <select formControlName="usoCfdi"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm">
+                  <option value="">Seleccionar...</option>
+                  @for (uso of usosCfdi; track uso.codigo) {
+                    <option [value]="uso.codigo">{{ uso.codigo }} - {{ uso.nombre }}</option>
+                  }
+                </select>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email para factura</label>
+                <input type="email" formControlName="email" placeholder="correo@ejemplo.com"
+                  class="w-full h-11 px-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0a0f1a] text-sm" />
+              </div>
+            </div>
+          }
+        </form>
+      </div>
+    }
+
+    <!-- Paso 3: Método de pago -->
+    @if (currentStep() === 'pago') {
+      <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <i class="material-symbols-outlined text-[#E60012]">payments</i>
+          Método de pago
+        </h2>
+
+        <div class="space-y-3">
+          <button type="button" (click)="selectMetodoPago('transferencia')"
+            class="w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4"
+            [ngClass]="selectedMetodoPago() === 'transferencia' ? 'border-[#E60012] bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-[#172036] hover:border-gray-300'">
+            <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <i class="material-symbols-outlined text-blue-600">account_balance</i>
+            </div>
+            <div class="flex-1 text-left">
+              <p class="font-medium text-gray-900 dark:text-white">Transferencia bancaria</p>
+              <p class="text-sm text-gray-500">SPEI o transferencia</p>
+            </div>
+            @if (selectedMetodoPago() === 'transferencia') {
+              <i class="material-symbols-outlined text-[#E60012]">check_circle</i>
+            }
+          </button>
+
+          <button type="button" (click)="selectMetodoPago('tarjeta')"
+            class="w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4"
+            [ngClass]="selectedMetodoPago() === 'tarjeta' ? 'border-[#E60012] bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-[#172036] hover:border-gray-300'">
+            <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+              <i class="material-symbols-outlined text-purple-600">credit_card</i>
+            </div>
+            <div class="flex-1 text-left">
+              <p class="font-medium text-gray-900 dark:text-white">Tarjeta de crédito/débito</p>
+              <p class="text-sm text-gray-500">Visa, Mastercard</p>
+            </div>
+            @if (selectedMetodoPago() === 'tarjeta') {
+              <i class="material-symbols-outlined text-[#E60012]">check_circle</i>
+            }
+          </button>
+
+          <button type="button" (click)="selectMetodoPago('efectivo')"
+            class="w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4"
+            [ngClass]="selectedMetodoPago() === 'efectivo' ? 'border-[#E60012] bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-[#172036] hover:border-gray-300'">
+            <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <i class="material-symbols-outlined text-green-600">payments</i>
+            </div>
+            <div class="flex-1 text-left">
+              <p class="font-medium text-gray-900 dark:text-white">Pago en efectivo</p>
+              <p class="text-sm text-gray-500">Pago contra entrega</p>
+            </div>
+            @if (selectedMetodoPago() === 'efectivo') {
+              <i class="material-symbols-outlined text-[#E60012]">check_circle</i>
+            }
+          </button>
+        </div>
+
+        <!-- Modalidad de pago -->
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-[#172036]">
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Modalidad de pago</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" (click)="selectModalidadPago('contado')"
+              class="p-3 rounded-lg border-2 transition-all text-left"
+              [ngClass]="selectedModalidadPago() === 'contado' ? 'border-[#E60012] bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-[#172036] hover:border-gray-300'">
+              <p class="font-medium text-gray-900 dark:text-white text-sm">Pago de contado</p>
+            </button>
+            <button type="button" (click)="selectModalidadPago('credito')"
+              class="p-3 rounded-lg border-2 transition-all text-left"
+              [ngClass]="selectedModalidadPago() === 'credito' ? 'border-[#E60012] bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-[#172036] hover:border-gray-300'">
+              <p class="font-medium text-gray-900 dark:text-white text-sm">Crédito</p>
+            </button>
+            <button type="button" (click)="selectModalidadPago('parcialidades')"
+              class="p-3 rounded-lg border-2 transition-all text-left"
+              [ngClass]="selectedModalidadPago() === 'parcialidades' ? 'border-[#E60012] bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-[#172036] hover:border-gray-300'">
+              <p class="font-medium text-gray-900 dark:text-white text-sm">Parcialidades</p>
+            </button>
+            <button type="button" (click)="selectModalidadPago('anticipo')"
+              class="p-3 rounded-lg border-2 transition-all text-left"
+              [ngClass]="selectedModalidadPago() === 'anticipo' ? 'border-[#E60012] bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-[#172036] hover:border-gray-300'">
+              <p class="font-medium text-gray-900 dark:text-white text-sm">Anticipo</p>
+            </button>
+          </div>
+
+          @if (selectedModalidadPago() === 'parcialidades') {
+            <div class="mt-4 p-4 bg-gray-50 dark:bg-[#0a0f1a] rounded-lg">
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Número de parcialidades:</p>
+              <div class="flex gap-2">
+                @for (num of [3, 6, 9, 12]; track num) {
+                  <button type="button" (click)="selectParcialidades(num)"
+                    class="flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all"
+                    [ngClass]="selectedParcialidades() === num ? 'border-[#E60012] bg-[#E60012] text-white' : 'border-gray-200 dark:border-[#172036] text-gray-700 dark:text-gray-300'">
+                    {{ num }} meses
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Paso 4: Confirmación -->
+    @if (currentStep() === 'confirmacion') {
+      <div class="space-y-4">
+        <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-6">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resumen del pedido</h2>
+          
+          <div class="space-y-3 max-h-60 overflow-y-auto">
+            @for (item of cart.items(); track item.item.tire.sku) {
+              <div class="flex items-center gap-3 py-2 border-b border-gray-100 dark:border-[#172036] last:border-0">
+                <img [src]="item.item.tire.urlImagen || 'images/llantera/generic-tyre.png'" class="w-12 h-12 rounded-lg object-cover" />
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.item.tire.medidaOriginal }}</p>
+                  <p class="text-xs text-gray-500">x{{ item.quantity }}</p>
+                </div>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">${{ formatPrice(item.item.price * item.quantity) }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-[#172036] space-y-2">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600 dark:text-gray-400">Subtotal</span>
+              <span class="text-gray-900 dark:text-white">${{ formatPrice(cart.subtotal()) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600 dark:text-gray-400">IVA (16%)</span>
+              <span class="text-gray-900 dark:text-white">${{ formatPrice(cart.iva()) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600 dark:text-gray-400">Envío</span>
+              <span class="text-green-600">Gratis</span>
+            </div>
+            <div class="flex justify-between text-lg font-bold pt-2 border-t border-gray-200 dark:border-[#172036]">
+              <span class="text-gray-900 dark:text-white">Total</span>
+              <span class="text-[#E60012]">${{ formatPrice(cart.total()) }}</span>
+            </div>
+          </div>
+        </div>
+
+        @if (selectedDireccion(); as dir) {
+          <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-4">
+            <div class="flex items-start gap-3">
+              <i class="material-symbols-outlined text-gray-400">location_on</i>
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ dir.alias }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDireccion(dir) }}</p>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (selectedMetodoPago(); as metodo) {
+          <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-4">
+            <div class="flex items-start gap-3">
+              <i class="material-symbols-outlined text-gray-400">payments</i>
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ getMetodoPagoLabel(metodo) }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ getModalidadPagoLabel(selectedModalidadPago()) }}
+                  @if (selectedModalidadPago() === 'parcialidades') {
+                    <span class="font-medium"> - {{ selectedParcialidades() }} meses</span>
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Botones de navegación -->
+    <div class="mt-6 flex items-center justify-between gap-4">
+      @if (currentStep() !== 'direccion') {
+        <button type="button" (click)="prevStep()"
+          class="h-12 px-6 border border-gray-300 dark:border-[#172036] text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-[#15203c] transition-colors">
+          Anterior
+        </button>
+      } @else {
+        <div></div>
+      }
+
+      @if (currentStep() !== 'confirmacion') {
+        <button type="button" (click)="nextStep()"
+          class="h-12 px-8 bg-[#E60012] hover:bg-red-700 text-white rounded-xl font-medium transition-colors">
+          Continuar
+        </button>
+      } @else {
+        <button type="button" (click)="confirmarPedido()" [disabled]="loading()"
+          class="h-12 px-8 bg-[#E60012] hover:bg-red-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2 disabled:opacity-50">
+          @if (loading()) {
+            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          }
+          Confirmar pedido
+        </button>
+      }
+    </div>
+  </main>
+</div>
+
+<!-- Modal de Procesando -->
+@if (showProcessingModal()) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-[#0c1427] rounded-2xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[#E60012]/10 flex items-center justify-center">
+        <div class="w-10 h-10 border-4 border-[#E60012] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Procesando tu pedido</h3>
+      <p class="text-gray-500 dark:text-gray-400">Por favor espera un momento...</p>
+    </div>
+  </div>
+}
+
+<!-- Modal de Éxito -->
+@if (showSuccessModal()) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-[#0c1427] rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl">
+      <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <i class="material-symbols-outlined !text-[32px] text-green-500">check_circle</i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">¡Pedido realizado!</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Tu pedido ha sido procesado exitosamente.</p>
+      @if (completedOrderNumber()) {
+        <p class="text-sm font-medium text-[#E60012] mb-4">Número: {{ completedOrderNumber() }}</p>
+      }
+      <div class="space-y-2">
+        <button type="button" (click)="closeSuccessModal()"
+          class="w-full py-3 bg-[#E60012] hover:bg-[#c5000f] text-white font-semibold rounded-xl transition-colors">
+          Ver mis pedidos
+        </button>
+        <button type="button" (click)="continueShopping()"
+          class="w-full py-3 bg-gray-100 dark:bg-[#15203c] hover:bg-gray-200 dark:hover:bg-[#1a2744] text-gray-700 dark:text-gray-200 font-semibold rounded-xl transition-colors">
+          Seguir comprando
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de Error -->
+@if (showErrorModal()) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-[#0c1427] rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl">
+      <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+        <i class="material-symbols-outlined !text-[32px] text-red-500">error</i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Error al procesar</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ error() || 'Ocurrió un error inesperado.' }}</p>
+      <button type="button" (click)="closeErrorModal()"
+        class="w-full py-3 bg-gray-200 dark:bg-[#172036] hover:bg-gray-300 dark:hover:bg-[#1e2a47] text-gray-900 dark:text-white font-semibold rounded-xl transition-colors">
+        Cerrar
+      </button>
+    </div>
+  </div>
+}

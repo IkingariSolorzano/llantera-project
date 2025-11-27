@@ -1,0 +1,410 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0 text-lg font-semibold text-gray-900 dark:text-white">
+    Historial de Ventas
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li class="breadcrumb-item inline-block relative text-sm mx-[11px]">
+      <a routerLink="/dashboard" class="inline-block relative transition-all hover:text-primary-500">
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[11px]">
+      Ventas
+    </li>
+  </ol>
+</div>
+
+<!-- Loading y Error -->
+@if (loading()) {
+  <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-8 text-center mb-6">
+    <div class="animate-spin w-8 h-8 border-4 border-[#E60012] border-t-transparent rounded-full mx-auto mb-3"></div>
+    <p class="text-sm text-gray-500">Cargando ventas...</p>
+  </div>
+}
+@if (error()) {
+  <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 flex items-center gap-3">
+    <i class="material-symbols-outlined text-red-500">error</i>
+    <span class="text-sm text-red-600 dark:text-red-400">{{ error() }}</span>
+    <button type="button" (click)="loadVentas()" class="ml-auto px-3 py-1 bg-red-600 text-white text-xs rounded-lg">Reintentar</button>
+  </div>
+}
+
+<!-- Barra de búsqueda -->
+<div class="mb-4 flex gap-3">
+  <div class="flex-1 relative">
+    <i class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-[20px]">search</i>
+    <input
+      type="text"
+      placeholder="Buscar por número de pedido..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+      (keyup.enter)="onSearch()"
+      class="w-full h-11 pl-10 pr-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+    />
+  </div>
+  <button type="button" (click)="onSearch()" class="px-4 h-11 bg-[#E60012] text-white rounded-lg text-sm font-medium hover:bg-red-700">
+    Buscar
+  </button>
+</div>
+
+<!-- Filtros -->
+<div class="mb-6 flex flex-wrap gap-2">
+  <button
+    type="button"
+    (click)="setFilter('todas')"
+    class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+    [ngClass]="filterFacturada() === 'todas'
+      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+      : 'bg-white dark:bg-[#0c1427] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#172036] hover:bg-gray-50'"
+  >
+    Todas ({{ ventas().length }})
+  </button>
+  <button
+    type="button"
+    (click)="setFilter('facturadas')"
+    class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+    [ngClass]="filterFacturada() === 'facturadas'
+      ? 'bg-green-100 text-green-700'
+      : 'bg-white dark:bg-[#0c1427] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#172036] hover:bg-gray-50'"
+  >
+    <i class="material-symbols-outlined !text-[16px]">check_circle</i>
+    Facturadas ({{ getConteoFacturadas() }})
+  </button>
+  <button
+    type="button"
+    (click)="setFilter('sin_factura')"
+    class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+    [ngClass]="filterFacturada() === 'sin_factura'
+      ? 'bg-yellow-100 text-yellow-700'
+      : 'bg-white dark:bg-[#0c1427] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#172036] hover:bg-gray-50'"
+  >
+    <i class="material-symbols-outlined !text-[16px]">pending</i>
+    Sin factura ({{ getConteoSinFactura() }})
+  </button>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-6">
+  <!-- Lista de ventas -->
+  <div class="lg:col-span-2 space-y-4">
+    @if (filteredVentas().length === 0) {
+      <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-12 text-center">
+        <i class="material-symbols-outlined !text-[64px] text-gray-300 dark:text-gray-600 mb-4">point_of_sale</i>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Sin ventas</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          No hay ventas con el filtro seleccionado.
+        </p>
+      </div>
+    } @else {
+      @for (venta of filteredVentas(); track venta.id) {
+        <button
+          type="button"
+          (click)="openDetail(venta)"
+          class="w-full text-left bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-5 hover:border-[#E60012]/40 hover:shadow-md transition-all"
+          [class.ring-2]="selectedVenta()?.id === venta.id"
+          [class.ring-[#E60012]]="selectedVenta()?.id === venta.id"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <p class="text-base font-semibold text-gray-900 dark:text-white">
+                  {{ venta.orderNumber }}
+                </p>
+                @if (hasFactura(venta)) {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                    <i class="material-symbols-outlined !text-[14px]">check_circle</i>
+                    Facturada
+                  </span>
+                } @else if (venta.requiresInvoice) {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400">
+                    <i class="material-symbols-outlined !text-[14px]">pending</i>
+                    Pendiente factura
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                    Sin factura requerida
+                  </span>
+                }
+              </div>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                <span class="font-medium">{{ (venta.items || []).length }} productos</span>
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                Pedido: {{ formatDate(venta.createdAt) }} @if (venta.deliveredAt) { · Entregado: {{ formatDate(venta.deliveredAt) }} }
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="text-lg font-bold text-gray-900 dark:text-white">
+                ${{ formatPrice(venta.total) }}
+              </p>
+              <p class="text-xs text-gray-500 mt-1">{{ getMetodoPagoLabel(venta.paymentMethod) }}</p>
+            </div>
+          </div>
+        </button>
+      }
+    }
+  </div>
+
+  <!-- Panel de detalle -->
+  <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-5 h-fit sticky top-[100px]">
+    @if (selectedVenta(); as venta) {
+      <div class="flex items-start justify-between gap-2 mb-4">
+        <div>
+          <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ venta.orderNumber }}</p>
+          <p class="text-xs text-gray-500">@if (venta.deliveredAt) { Entregado: {{ formatDate(venta.deliveredAt) }} }</p>
+        </div>
+        <button type="button" (click)="closeDetail()" class="p-1 hover:bg-gray-100 dark:hover:bg-[#15203c] rounded-lg">
+          <i class="material-symbols-outlined !text-[20px] text-gray-400">close</i>
+        </button>
+      </div>
+
+      <!-- Cliente -->
+      <div class="mb-4 pb-4 border-b border-gray-200 dark:border-[#172036]">
+        <p class="text-xs font-medium text-gray-500 uppercase mb-2">Cliente</p>
+        <p class="text-sm font-medium text-gray-900 dark:text-white">Usuario #{{ venta.userId }}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Tel: {{ venta.shippingAddress.phone }}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDireccion(venta) }}</p>
+      </div>
+
+      <!-- Productos -->
+      <div class="mb-4 pb-4 border-b border-gray-200 dark:border-[#172036]">
+        <p class="text-xs font-medium text-gray-500 uppercase mb-2">Productos</p>
+        <div class="space-y-2">
+          @for (item of (venta.items || []); track item.tireSku) {
+            <div class="flex items-center justify-between text-sm">
+              <div>
+                <p class="text-gray-900 dark:text-white">{{ item.tireMeasure }}</p>
+                <p class="text-xs text-gray-500">SKU: {{ item.tireSku }} · x{{ item.quantity }}</p>
+              </div>
+              <p class="font-medium text-gray-900 dark:text-white">${{ formatPrice(item.subtotal) }}</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Totales -->
+      <div class="mb-4 pb-4 border-b border-gray-200 dark:border-[#172036] space-y-1 text-sm">
+        <div class="flex justify-between">
+          <span class="text-gray-500">Subtotal</span>
+          <span class="text-gray-900 dark:text-white">${{ formatPrice(venta.subtotal) }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">Envío</span>
+          <span class="text-gray-900 dark:text-white">${{ formatPrice(venta.shippingCost) }}</span>
+        </div>
+        <div class="flex justify-between font-bold text-base pt-1">
+          <span class="text-gray-900 dark:text-white">Total</span>
+          <span class="text-[#E60012]">${{ formatPrice(venta.total) }}</span>
+        </div>
+      </div>
+
+      <!-- Facturación -->
+      <div class="mb-4">
+        <p class="text-xs font-medium text-gray-500 uppercase mb-2">Facturación</p>
+        @if (venta.billingInfo) {
+          <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-3">
+            <p class="text-sm font-medium text-blue-700 dark:text-blue-400">{{ venta.billingInfo.rfc }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ venta.billingInfo.razonSocial }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ venta.billingInfo.usoCfdi }}</p>
+          </div>
+        }
+
+        @if (hasFactura(venta)) {
+          <!-- Archivos de factura cargados -->
+          <div class="space-y-2 mb-3">
+            @if (venta.invoiceXmlPath) {
+              <button
+                type="button"
+                (click)="descargarFactura(venta, 'xml')"
+                class="w-full flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+              >
+                <div class="flex items-center gap-2">
+                  <i class="material-symbols-outlined text-green-600">check_circle</i>
+                  <span class="text-sm font-medium text-green-700 dark:text-green-400">Factura XML</span>
+                </div>
+                <i class="material-symbols-outlined !text-[18px] text-green-600">download</i>
+              </button>
+            }
+            @if (venta.invoicePdfPath) {
+              <button
+                type="button"
+                (click)="descargarFactura(venta, 'pdf')"
+                class="w-full flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+              >
+                <div class="flex items-center gap-2">
+                  <i class="material-symbols-outlined text-green-600">check_circle</i>
+                  <span class="text-sm font-medium text-green-700 dark:text-green-400">Factura PDF</span>
+                </div>
+                <i class="material-symbols-outlined !text-[18px] text-green-600">download</i>
+              </button>
+            }
+          </div>
+
+          <!-- Botón para agregar/reemplazar archivos -->
+          <button
+            type="button"
+            (click)="openUploadModal(venta)"
+            class="w-full flex items-center justify-center gap-2 p-2.5 border border-gray-300 dark:border-[#172036] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-[#15203c] transition-colors"
+          >
+            <i class="material-symbols-outlined !text-[18px]">edit</i>
+            <span class="text-sm">Agregar o reemplazar archivos</span>
+          </button>
+        } @else if (venta.requiresInvoice) {
+          <div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg mb-3">
+            <p class="text-sm text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
+              <i class="material-symbols-outlined !text-[18px]">warning</i>
+              Pendiente de facturar
+            </p>
+          </div>
+
+          <!-- Botón para subir factura -->
+          <button
+            type="button"
+            (click)="openUploadModal(venta)"
+            class="w-full flex items-center justify-center gap-2 p-3 bg-[#E60012] hover:bg-[#c5000f] text-white rounded-lg transition-colors"
+          >
+            <i class="material-symbols-outlined !text-[18px]">upload_file</i>
+            <span class="text-sm font-medium">Subir archivos de factura</span>
+          </button>
+        } @else {
+          <p class="text-sm text-gray-500 dark:text-gray-400">No requiere factura</p>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+        <i class="material-symbols-outlined !text-[48px] opacity-50 mb-2">touch_app</i>
+        <p class="text-sm">Selecciona una venta para ver el detalle</p>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal de subida de facturas -->
+@if (showUploadModal() && uploadVenta()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-[#0c1427] rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+          Archivos de factura
+        </h2>
+        <button type="button" (click)="closeUploadModal()" class="p-2 hover:bg-gray-100 dark:hover:bg-[#15203c] rounded-lg transition-colors">
+          <i class="material-symbols-outlined text-gray-500">close</i>
+        </button>
+      </div>
+
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        Pedido: <span class="font-medium text-gray-900 dark:text-white">{{ uploadVenta()?.orderNumber }}</span>
+      </p>
+
+      <!-- Estado actual con mejor visualización -->
+      <div class="mb-6 space-y-3">
+        <!-- XML Status -->
+        <div class="p-3 rounded-lg" [ngClass]="uploadVenta()?.invoiceXmlPath ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-[#0a0f1a] border border-gray-200 dark:border-[#172036]'">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="material-symbols-outlined !text-[20px]" [ngClass]="uploadVenta()?.invoiceXmlPath ? 'text-green-600' : 'text-gray-400'">
+                {{ uploadVenta()?.invoiceXmlPath ? 'check_circle' : 'code' }}
+              </i>
+              <span class="text-sm font-medium" [ngClass]="uploadVenta()?.invoiceXmlPath ? 'text-green-700 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'">
+                Archivo XML
+              </span>
+            </div>
+            @if (uploadVenta()?.invoiceXmlPath) {
+              <span class="text-xs font-semibold text-green-600 bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded">CARGADO</span>
+            } @else {
+              <span class="text-xs text-gray-400">Pendiente</span>
+            }
+          </div>
+        </div>
+
+        <!-- PDF Status -->
+        <div class="p-3 rounded-lg" [ngClass]="uploadVenta()?.invoicePdfPath ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-[#0a0f1a] border border-gray-200 dark:border-[#172036]'">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="material-symbols-outlined !text-[20px]" [ngClass]="uploadVenta()?.invoicePdfPath ? 'text-green-600' : 'text-gray-400'">
+                {{ uploadVenta()?.invoicePdfPath ? 'check_circle' : 'picture_as_pdf' }}
+              </i>
+              <span class="text-sm font-medium" [ngClass]="uploadVenta()?.invoicePdfPath ? 'text-green-700 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'">
+                Archivo PDF
+              </span>
+            </div>
+            @if (uploadVenta()?.invoicePdfPath) {
+              <span class="text-xs font-semibold text-green-600 bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded">CARGADO</span>
+            } @else {
+              <span class="text-xs text-gray-400">Pendiente</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Inputs de archivo -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ uploadVenta()?.invoiceXmlPath ? 'Reemplazar XML' : 'Subir XML' }}
+          </label>
+          <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors"
+            [ngClass]="uploadVenta()?.invoiceXmlPath 
+              ? 'border-green-300 dark:border-green-800 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20' 
+              : 'border-gray-300 dark:border-[#172036] hover:border-[#E60012] hover:bg-gray-50 dark:hover:bg-[#0a0f1a]'"
+          >
+            <i class="material-symbols-outlined !text-[20px]" [ngClass]="uploadVenta()?.invoiceXmlPath ? 'text-green-500' : 'text-gray-400'">
+              {{ uploadVenta()?.invoiceXmlPath ? 'sync' : 'upload_file' }}
+            </i>
+            <span class="text-sm" [ngClass]="uploadVenta()?.invoiceXmlPath ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'">
+              {{ uploadVenta()?.invoiceXmlPath ? 'Clic para reemplazar' : 'Seleccionar archivo XML' }}
+            </span>
+            <input 
+              type="file" 
+              accept=".xml"
+              class="hidden"
+              (change)="onFileSelected($event, 'xml')"
+              [disabled]="uploadingInvoice()"
+            />
+          </label>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {{ uploadVenta()?.invoicePdfPath ? 'Reemplazar PDF' : 'Subir PDF' }}
+          </label>
+          <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors"
+            [ngClass]="uploadVenta()?.invoicePdfPath 
+              ? 'border-green-300 dark:border-green-800 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20' 
+              : 'border-gray-300 dark:border-[#172036] hover:border-[#E60012] hover:bg-gray-50 dark:hover:bg-[#0a0f1a]'"
+          >
+            <i class="material-symbols-outlined !text-[20px]" [ngClass]="uploadVenta()?.invoicePdfPath ? 'text-green-500' : 'text-gray-400'">
+              {{ uploadVenta()?.invoicePdfPath ? 'sync' : 'picture_as_pdf' }}
+            </i>
+            <span class="text-sm" [ngClass]="uploadVenta()?.invoicePdfPath ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'">
+              {{ uploadVenta()?.invoicePdfPath ? 'Clic para reemplazar' : 'Seleccionar archivo PDF' }}
+            </span>
+            <input 
+              type="file" 
+              accept=".pdf"
+              class="hidden"
+              (change)="onFileSelected($event, 'pdf')"
+              [disabled]="uploadingInvoice()"
+            />
+          </label>
+        </div>
+      </div>
+
+      @if (uploadingInvoice()) {
+        <div class="mt-4 flex items-center justify-center gap-2 text-sm text-[#E60012]">
+          <div class="w-5 h-5 border-2 border-[#E60012] border-t-transparent rounded-full animate-spin"></div>
+          <span class="font-medium">Subiendo archivo...</span>
+        </div>
+      }
+
+      <div class="mt-6">
+        <button
+          type="button"
+          (click)="closeUploadModal()"
+          class="w-full py-2.5 bg-gray-200 dark:bg-[#172036] hover:bg-gray-300 dark:hover:bg-[#1e2a47] text-gray-900 dark:text-white font-medium rounded-lg transition-colors"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+}

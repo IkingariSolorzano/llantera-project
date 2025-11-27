@@ -1,0 +1,522 @@
+<!-- Breadcrumb -->
+<div class="mb-[25px] md:flex items-center justify-between">
+    <h5 class="mb-0">
+        Products Grid
+    </h5>
+    <ol class="breadcrumb mt-[12px] md:mt-0">
+        <li class="breadcrumb-item inline-block relative text-sm mx-[11px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+            <a routerLink="/dashboard" class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500">
+                <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2">
+                    home
+                </i>
+                Dashboard
+            </a>
+        </li>
+        <li class="breadcrumb-item inline-block relative text-sm mx-[11px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+            eCommerce
+        </li>
+        <li class="breadcrumb-item inline-block relative text-sm mx-[11px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+            Products Grid
+        </li>
+    </ol>
+</div>
+
+<!-- Products Filter -->
+<div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+    <div class="trezo-card-header sm:flex items-center justify-between">
+        <div class="trezo-card-title">
+            <h5 class="mb-0 font-medium">
+                Filter
+            </h5>
+        </div>
+        <div class="trezo-card-subtitle mt-[15px] sm:mt-0 sm:flex items-center gap-[20px]">
+            <form class="relative sm:w-[265px]">
+                <label class="leading-none absolute ltr:left-[13px] rtl:right-[13px] text-black dark:text-white mt-px top-1/2 -translate-y-1/2">
+                    <i class="material-symbols-outlined !text-[20px]">
+                        search
+                    </i>
+                </label>
+                <input type="text" placeholder="Search here....." class="bg-gray-50 border border-gray-50 h-[36px] text-xs rounded-md w-full block text-black pt-[11px] pb-[12px] ltr:pl-[38px] rtl:pr-[38px] ltr:pr-[13px] ltr:md:pr-[16px] rtl:pl-[13px] rtl:md:pl-[16px] placeholder:text-gray-500 outline-0 dark:bg-[#15203c] dark:text-white dark:border-[#15203c] dark:placeholder:text-gray-400">
+            </form>
+            <div class="trezo-card-dropdown relative mt-[15px] sm:mt-0">
+                <button type="button" class="trezo-card-dropdown-btn inline-block rounded-md border border-gray-100 py-[5px] md:py-[6.5px] px-[12px] md:px-[19px] transition-all hover:bg-gray-50 dark:border-[#172036] dark:hover:bg-[#0a0e19]"  (click)="toggleCardHeaderMenu()">
+                    <span class="inline-block relative ltr:pr-[17px] ltr:md:pr-[20px] rtl:pl-[17px] rtl:ml:pr-[20px]">
+                        Default Sorting
+                        <i class="ri-arrow-down-s-line text-lg absolute ltr:-right-[3px] rtl:-left-[3px] top-1/2 -translate-y-1/2"></i>
+                    </span>
+                </button>
+                @if (isCardHeaderOpen) {
+                    <ul class="trezo-card-dropdown-menu transition-all bg-white shadow-3xl rounded-md top-full py-[15px] absolute ltr:right-0 rtl:left-0 w-[195px] z-[5] dark:bg-dark dark:shadow-none">
+                        <li>
+                            <button type="button" class="block w-full transition-all text-black ltr:text-left rtl:text-right relative py-[8px] px-[20px] hover:bg-gray-50 dark:text-white dark:hover:bg-black">
+                                Default Sorting
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="block w-full transition-all text-black ltr:text-left rtl:text-right relative py-[8px] px-[20px] hover:bg-gray-50 dark:text-white dark:hover:bg-black">
+                                Price Low to High
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="block w-full transition-all text-black ltr:text-left rtl:text-right relative py-[8px] px-[20px] hover:bg-gray-50 dark:text-white dark:hover:bg-black">
+                                Price High to Low
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="block w-full transition-all text-black ltr:text-left rtl:text-right relative py-[8px] px-[20px] hover:bg-gray-50 dark:text-white dark:hover:bg-black">
+                                Top Sales
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="block w-full transition-all text-black ltr:text-left rtl:text-right relative py-[8px] px-[20px] hover:bg-gray-50 dark:text-white dark:hover:bg-black">
+                                Newest Arrivals
+                            </button>
+                        </li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Products Grid -->
+<div class="mb-[25px]">
+    @if (loading()) {
+        <div class="trezo-card bg-white dark:bg-[#0c1427] p-[20px] md:p-[25px] rounded-md text-gray-500 dark:text-gray-400">
+            Cargando catálogo de llantas...
+        </div>
+    } @else if (error()) {
+        <div class="trezo-card bg-white dark:bg-[#0c1427] p-[20px] md:p-[25px] rounded-md text-danger-500">
+            {{ error() }}
+        </div>
+    } @else if (items().length === 0) {
+        <div class="trezo-card bg-white dark:bg-[#0c1427] p-[20px] md:p-[25px] rounded-md text-gray-500 dark:text-gray-400">
+            No se encontraron llantas en el catálogo.
+        </div>
+    } @else {
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-[25px]">
+            @for (item of items(); track item.tire.id) {
+                <div class="md:mb-[10px] lg:mb-[17px]">
+                    <div class="relative">
+                        <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+                        <a routerLink="/dashboard/llantas/detalle" class="block rounded-md">
+                            <img
+                                [src]="getTireImage(item)"
+                                [alt]="item.tire.medidaOriginal || item.tire.sku"
+                                class="rounded-md object-cover w-full h-[200px]"
+                            />
+                        </a>
+                        <div class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 px-[14px] py-[8px] bg-primary-500 text-white text-sm font-semibold">
+                            ${{ item.price }}
+                        </div>
+                    </div>
+                    <div class="mt-[19px]">
+                        <h6 class="text-md font-normal">
+                            <a routerLink="/dashboard/llantas/detalle" class="transition-all hover:text-primary-500">
+                                {{ item.tire.medidaOriginal || (item.tire.ancho + '/' + (item.tire.perfil || '') + 'R' + item.tire.rin) }}
+                            </a>
+                        </h6>
+                        <div class="flex items-center justify-between mt-[8px] text-xs text-gray-500 dark:text-gray-400">
+                            <span>
+                                SKU: {{ item.tire.sku }}
+                            </span>
+                            <span>
+                                Nivel: {{ item.priceCode || 'lista' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Grilla de demo existente (productos genéricos) -->
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-[25px] mb-[25px]">
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product6.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    Apple MacBook Pro 16.2" with M3 Pro Chip
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $3479
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $3599
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product7.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    SAMSUNG Galaxy Tab A9+ Tablet 11”
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $549
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $649
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-half-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product8.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    Apple iPhone 15 Pro Max (512 GB)
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $1479
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $1599
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-line"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product9.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    Gildan Men's Crew T-Shirts, Multipack
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $79
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $89
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-half-fill"></i>
+                    <i class="ri-star-line"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product10.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    Skechers Men's Summits High Range
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $849
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $999
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-half-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product11.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    Amazfit GTR 3 Smart Watch for Men
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $49
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $69
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-line"></i>
+                    <i class="ri-star-line"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product12.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    SOJOS Small Round Polarized Sunglasses
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $39
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $49
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-half-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product13.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    Nautical Clock Ship Table Clock Brass Desk
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $25
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $39
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="md:mb-[10px] lg:mb-[17px]">
+        <div class="relative">
+            <span class="block ltr:right-0 rtl:left-0 bottom-0 w-[65px] h-[65px] absolute ltr:rounded-tl-md rtl:rounded-tr-md bg-white dark:bg-[#0c1427]"></span>
+            <a routerLink="/dashboard/ecommerce-page/product-details" class="block rounded-md">
+                <img src="images/products/product14.jpg" alt="product-image" class="rounded-md">
+            </a>
+            <button class="rounded-md transition-all z-[1] inline-block absolute ltr:right-0 rtl:left-0 bottom-0 w-[60px] h-[60px] leading-[72px] bg-primary-500 text-white hover:bg-primary-400" type="button">
+                <i class="material-symbols-outlined">
+                    shopping_cart
+                </i>
+            </button>
+        </div>
+        <div class="mt-[19px]">
+            <h6 class="text-md font-normal">
+                <a routerLink="/dashboard/ecommerce-page/product-details" class="transition-all hover:text-primary-500">
+                    Carhartt, Durable, Adjustable Crossbody Bag
+                </a>
+            </h6>
+            <div class="flex items-center justify-between mt-[12px] md:mt-[20px] lg:mt-[28px]">
+                <div class="flex items-center">
+                    <span class="block font-bold text-black dark:text-white text-[20px]">
+                        $149
+                    </span>
+                    <span class="block text-md text-gray-400 ltr:ml-[7px] rtl:mr-[7px]">
+                        $299
+                    </span>
+                </div>
+                <div class="leading-none text-orange-400 flex items-center gap-[2px]">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-line"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+<div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+    <div class="trezo-card-content">
+        <div class="sm:flex sm:items-center justify-between">
+            <p class="mb-0">
+                Showing 9 of 36 results
+            </p>
+            <ol class="mt-[10px] sm:mt-0">
+                <li class="inline-block mx-[3px] ltr:first:ml-0 ltr:last:mr-0 rtl:first:mr-0 rtl:last:ml-0">
+                    <a routerLink="." class="w-[31px] h-[31px] block leading-[29px] relative text-center rounded-md border border-gray-100 dark:border-[#172036] transition-all hover:bg-primary-500 hover:text-white hover:border-primary-500">
+                        <span class="opacity-0">
+                            0
+                        </span>
+                        <i class="material-symbols-outlined left-0 right-0 absolute top-1/2 -translate-y-1/2">
+                            chevron_left
+                        </i>
+                    </a>
+                </li>
+                <li class="inline-block mx-[3px] ltr:first:ml-0 ltr:last:mr-0 rtl:first:mr-0 rtl:last:ml-0">
+                    <a routerLink="." class="w-[31px] h-[31px] block leading-[29px] relative text-center rounded-md border border-primary-500 bg-primary-500 text-white">
+                        1
+                    </a>
+                </li>
+                <li class="inline-block mx-[3px] ltr:first:ml-0 ltr:last:mr-0 rtl:first:mr-0 rtl:last:ml-0">
+                    <a routerLink="." class="w-[31px] h-[31px] block leading-[29px] relative text-center rounded-md border border-gray-100 dark:border-[#172036] transition-all hover:bg-primary-500 hover:text-white hover:border-primary-500">
+                        2
+                    </a>
+                </li>
+                <li class="inline-block mx-[3px] ltr:first:ml-0 ltr:last:mr-0 rtl:first:mr-0 rtl:last:ml-0">
+                    <a routerLink="." class="w-[31px] h-[31px] block leading-[29px] relative text-center rounded-md border border-gray-100 dark:border-[#172036] transition-all hover:bg-primary-500 hover:text-white hover:border-primary-500">
+                        3
+                    </a>
+                </li>
+                <li class="inline-block mx-[3px] ltr:first:ml-0 ltr:last:mr-0 rtl:first:mr-0 rtl:last:ml-0">
+                    <a routerLink="." class="w-[31px] h-[31px] block leading-[29px] relative text-center rounded-md border border-gray-100 dark:border-[#172036] transition-all hover:bg-primary-500 hover:text-white hover:border-primary-500">
+                        4
+                    </a>
+                </li>
+                <li class="inline-block mx-[3px] ltr:first:ml-0 ltr:last:mr-0 rtl:first:mr-0 rtl:last:ml-0">
+                    <a routerLink="." class="w-[31px] h-[31px] block leading-[29px] relative text-center rounded-md border border-gray-100 dark:border-[#172036] transition-all hover:bg-primary-500 hover:text-white hover:border-primary-500">
+                        <span class="opacity-0">
+                            0
+                        </span>
+                        <i class="material-symbols-outlined left-0 right-0 absolute top-1/2 -translate-y-1/2">
+                            chevron_right
+                        </i>
+                    </a>
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>

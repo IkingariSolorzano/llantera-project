@@ -1,0 +1,205 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mi carrito</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        {{ cart.itemCount() }} productos en tu carrito
+      </p>
+    </div>
+    @if (!cart.isEmpty()) {
+      <button
+        type="button"
+        (click)="clearCart()"
+        class="px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
+      >
+        <i class="material-symbols-outlined !text-[18px]">delete_sweep</i>
+        Vaciar carrito
+      </button>
+    }
+  </div>
+
+  @if (cart.isEmpty()) {
+    <!-- Carrito vacío -->
+    <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-12 text-center">
+      <i class="material-symbols-outlined !text-[80px] text-gray-300 dark:text-gray-600 mb-4">shopping_cart</i>
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Tu carrito está vacío</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        Explora nuestro catálogo y agrega productos a tu carrito
+      </p>
+      <button
+        type="button"
+        (click)="goToCatalog()"
+        class="px-6 py-3 bg-[#E60012] hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors inline-flex items-center gap-2"
+      >
+        <i class="material-symbols-outlined !text-[18px]">storefront</i>
+        Ir al catálogo
+      </button>
+    </div>
+  } @else {
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Lista de productos -->
+      <div class="lg:col-span-2 space-y-4">
+        @for (cartItem of cart.items(); track cartItem.item.tire.sku) {
+          <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-4 hover:shadow-md transition-shadow">
+            <div class="flex gap-4">
+              <!-- Imagen -->
+              <div class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+                <img 
+                  [src]="cartItem.item.tire.urlImagen || 'images/llantera/generic-tyre.png'" 
+                  [alt]="cartItem.item.tire.medidaOriginal"
+                  class="w-full h-full object-cover rounded-lg bg-gray-100 dark:bg-[#15203c]"
+                />
+              </div>
+
+              <!-- Info del producto -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                      {{ cartItem.item.tire.medidaOriginal || cartItem.item.tire.sku }}
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                      SKU: {{ cartItem.item.tire.sku }}
+                    </p>
+                    
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                      @if (cartItem.item.tire.construccion) {
+                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-[#15203c] text-gray-600 dark:text-gray-400 text-xs font-medium rounded">
+                          {{ cartItem.item.tire.construccion }}
+                        </span>
+                      }
+                      @if (cartItem.item.tire.abreviaturaUso) {
+                        <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-medium rounded">
+                          {{ cartItem.item.tire.abreviaturaUso }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Botón eliminar -->
+                  <button 
+                    type="button"
+                    (click)="removeItem(cartItem.item.tire.sku)"
+                    class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    title="Eliminar del carrito"
+                  >
+                    <i class="material-symbols-outlined !text-[20px]">delete</i>
+                  </button>
+                </div>
+
+                <!-- Precio y controles de cantidad -->
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex items-center gap-2">
+                    <!-- Controles de cantidad -->
+                    <button 
+                      type="button"
+                      class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-[#15203c] text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#1e2d4d] transition-colors"
+                      (click)="decrementQuantity(cartItem.item.tire.sku)"
+                    >
+                      <i class="material-symbols-outlined !text-[20px]">remove</i>
+                    </button>
+                    <span class="w-12 text-center text-lg font-semibold text-gray-900 dark:text-white">
+                      {{ cartItem.quantity }}
+                    </span>
+                    <button 
+                      type="button"
+                      class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-[#15203c] text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#1e2d4d] transition-colors"
+                      (click)="incrementQuantity(cartItem.item.tire.sku)"
+                    >
+                      <i class="material-symbols-outlined !text-[20px]">add</i>
+                    </button>
+                  </div>
+
+                  <!-- Precios -->
+                  <div class="text-right">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      ${{ formatPrice(cartItem.item.price) }} c/u
+                    </p>
+                    <p class="text-xl font-bold text-[#E60012]">
+                      ${{ formatPrice(cartItem.item.price * cartItem.quantity) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Resumen del pedido -->
+      <div class="lg:col-span-1">
+        <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-6 sticky top-32">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resumen del pedido</h2>
+          
+          <!-- Desglose por producto -->
+          <div class="space-y-2 mb-4 max-h-40 overflow-y-auto">
+            @for (cartItem of cart.items(); track cartItem.item.tire.sku) {
+              <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                <span class="truncate max-w-[180px]">{{ cartItem.item.tire.medidaOriginal }} x{{ cartItem.quantity }}</span>
+                <span>${{ formatPrice(cartItem.item.price * cartItem.quantity) }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="space-y-3 mb-6 border-t border-gray-200 dark:border-[#172036] pt-3">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600 dark:text-gray-400">Subtotal ({{ cart.itemCount() }} productos)</span>
+              <span class="text-gray-900 dark:text-white font-medium">${{ formatPrice(cart.subtotal()) }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600 dark:text-gray-400">IVA (16%)</span>
+              <span class="text-gray-900 dark:text-white font-medium">${{ formatPrice(cart.iva()) }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600 dark:text-gray-400">Envío</span>
+              <span class="text-gray-500 dark:text-gray-400">Por calcular</span>
+            </div>
+            <div class="border-t border-gray-200 dark:border-[#172036] pt-3">
+              <div class="flex items-center justify-between">
+                <span class="text-base font-semibold text-gray-900 dark:text-white">Total</span>
+                <span class="text-2xl font-bold text-[#E60012]">${{ formatPrice(cart.total()) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="goToCheckout()"
+            class="w-full py-3 bg-[#E60012] hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            <i class="material-symbols-outlined !text-[18px]">shopping_cart_checkout</i>
+            Proceder al pago
+          </button>
+
+          <button
+            type="button"
+            (click)="goToCatalog()"
+            class="w-full py-3 mt-3 border border-gray-200 dark:border-[#172036] text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-[#15203c] flex items-center justify-center gap-2"
+          >
+            <i class="material-symbols-outlined !text-[18px]">arrow_back</i>
+            Seguir comprando
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Toast de notificación -->
+@if (showToast()) {
+  <div class="fixed bottom-6 right-6 z-50 animate-slide-up">
+    <div 
+      class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl"
+      [ngClass]="toastType() === 'success' 
+        ? 'bg-green-500 text-white' 
+        : 'bg-red-500 text-white'"
+    >
+      <i class="material-symbols-outlined !text-[20px]">
+        {{ toastType() === 'success' ? 'check_circle' : 'error' }}
+      </i>
+      <span class="text-sm font-medium">{{ toastMessage() }}</span>
+    </div>
+  </div>
+}

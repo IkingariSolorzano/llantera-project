@@ -1,0 +1,255 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    {{ pageTitle() }}
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      <a routerLink="/dashboard"
+        class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500">
+        <i
+          class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2">
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      Usuarios
+    </li>
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+      {{ pageTitle() }}
+    </li>
+  </ol>
+</div>
+
+@if (loading()) {
+<div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md text-sm text-gray-500 dark:text-gray-400">
+  Cargando información del usuario...
+</div>
+} @else {
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="xl:grid xl:grid-cols-5 2xl:grid-cols-3 gap-[25px]">
+    <div class="xl:col-span-3 2xl:col-span-2">
+      <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+        <div class="trezo-card-content">
+          <div class="sm:grid sm:grid-cols-2 sm:gap-[25px]">
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Correo</label>
+              <input type="email" formControlName="email"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="correo@ejemplo.com" />
+              @if (isInvalid('email')) {
+              <small class="text-danger-500">Ingresa un correo válido.</small>
+              }
+            </div>
+
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Primer nombre</label>
+              <input type="text" formControlName="firstName"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Primer nombre" />
+              @if (isInvalid('firstName')) {
+              <small class="text-danger-500">Este campo es obligatorio.</small>
+              }
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Primer apellido</label>
+              <input type="text" formControlName="firstLastName"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Primer apellido" />
+              @if (isInvalid('firstLastName')) {
+              <small class="text-danger-500">Este campo es obligatorio.</small>
+              }
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Segundo apellido</label>
+              <input type="text" formControlName="secondLastName"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Segundo apellido (opcional)" />
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Teléfono</label>
+              <input type="tel" formControlName="phone" maxlength="10"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="+52 33 0000 0000" />
+              @if (isInvalid('phone')) {
+              <small class="text-danger-500">El teléfono debe tener 10 dígitos.</small>
+              }
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Calle</label>
+              <input type="text" formControlName="addressStreet"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Calle del domicilio" />
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Número</label>
+              <input type="text" formControlName="addressNumber"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Número exterior / interior" />
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Colonia</label>
+              <input type="text" formControlName="addressNeighborhood"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Colonia / barrio" />
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Código postal</label>
+              <input type="text" formControlName="addressPostalCode"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Código postal" />
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Empresa</label>
+              <select formControlName="companyId"
+                class="h-[55px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer transition-all focus:border-primary-500">
+                <option value="">Sin asignar</option>
+                @for (empresa of companyOptions(); track empresa.id) {
+                <option [value]="empresa.id">{{ empresa.socialReason }}</option>
+                }
+              </select>
+              @if (companiesLoading()) {
+              <small class="text-gray-500">Cargando catálogo de empresas...</small>
+              } @else if (companiesError()) {
+              <small class="text-danger-500">{{ companiesError() }}</small>
+              }
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Rol</label>
+              <select formControlName="role"
+                class="h-[55px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer transition-all focus:border-primary-500">
+                <option value="customer">Cliente</option>
+                <option value="employee">Empleado</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Nivel de precio</label>
+              <select formControlName="priceLevelId"
+                class="h-[55px] rounded-md border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[13px] block w-full outline-0 cursor-pointer transition-all focus:border-primary-500">
+                <option value="">Seleccione un nivel</option>
+                @for (nivel of priceLevelOptions(); track nivel.id) {
+                <option [value]="nivel.id">{{ nivel.label }}</option>
+                }
+              </select>
+              @if (priceLevelsLoading()) {
+              <small class="text-gray-500">Cargando niveles de precio...</small>
+              } @else if (priceLevelsError()) {
+              <small class="text-danger-500">{{ priceLevelsError() }}</small>
+              }
+              @if (isInvalid('priceLevelId')) {
+              <small class="text-danger-500">El nivel de precio es obligatorio.</small>
+              }
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Foto de perfil (URL)</label>
+              <input type="text" formControlName="profileImageUrl"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="https://..." />
+            </div>
+            <div class="mb-[20px] sm:mb-0">
+              <label class="mb-[10px] text-black dark:text-white font-medium block">Contraseña</label>
+              <input type="password" formControlName="password"
+                class="h-[55px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] px-[17px] block w-full outline-0 transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-primary-500"
+                placeholder="Nueva contraseña (opcional, mínimo 8 caracteres)" />
+              @if (isInvalid('password')) {
+              <small class="text-danger-500">{{ isEditMode() ? 'La contraseña debe tener al menos 8 caracteres.' : 'La
+                contraseña es obligatoria.' }}</small>
+              }
+            </div>
+            <div class="mb-[20px] sm:mb-0 flex items-center">
+              <label class="text-black dark:text-white font-medium block mr-3">Activo</label>
+              <input type="checkbox" formControlName="active" class="cursor-pointer" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="xl:col-span-2 2xl:col-span-1">
+      <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+        <div class="trezo-card-content space-y-[12px] text-sm text-gray-500 dark:text-gray-400">
+          <p>
+            Este formulario guarda la información directamente en el backend de llantera-hex.
+          </p>
+          @if (error()) {
+          <div class="text-danger-500">
+            {{ error() }}
+          </div>
+          }
+          @if (success()) {
+          <div class="text-success-500">
+            {{ success() }}
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="trezo-card mb-[25px]">
+    <div class="trezo-card-content">
+      <button type="button" (click)="onCancel()"
+        class="font-medium inline-block transition-all rounded-md md:text-md ltr:mr-[19px] rtl:ml-[19px] py-[10px] md:py-[12px] px-[20px] md:px-[22px] bg-danger-500 text-white hover:bg-danger-400"
+        [disabled]="saving()">
+        Cancelar
+      </button>
+      <button type="submit"
+        class="font-medium inline-flex items-center gap-[8px] transition-all rounded-md md:text-md py-[10px] md:py-[12px] px-[20px] md:px-[22px] bg-primary-500 text-white hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="saving()">
+        <span>{{ submitLabel() }}</span>
+        @if (saving()) {
+        <span class="loading loading-spinner loading-sm"></span>
+        }
+      </button>
+    </div>
+  </div>
+</form>
+
+<div class="add-new-popup z-[999] fixed transition-all inset-0 overflow-x-hidden overflow-y-auto"
+  [class.active]="showConfirmModal()">
+  <div class="popup-dialog flex transition-all max-w-[550px] min-h-full items-center mx-auto">
+    <div class="trezo-card w-full bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+      <div
+        class="trezo-card-header bg-gray-50 dark:bg-[#15203c] mb-[20px] md:mb-[25px] flex items-center justify-between -mx-[20px] md:-mx-[25px] -mt-[20px] md:-mt-[25px] p-[20px] md:p-[25px] rounded-t-md">
+        <div class="trezo-card-title">
+          <h5 class="mb-0">
+            Confirmar {{ isEditMode() ? 'actualización' : 'creación' }} de usuario
+          </h5>
+        </div>
+        <div class="trezo-card-subtitle">
+          <button type="button"
+            class="text-[23px] transition-all leading-none text-black dark:text-white hover:text-primary-500"
+            (click)="closeConfirmModal()">
+            <i class="ri-close-fill"></i>
+          </button>
+        </div>
+      </div>
+      <div class="trezo-card-content pb-[20px] md:pb-[25px]">
+        <p class="mb-[10px] text-sm text-gray-600 dark:text-gray-300">
+          Revisa el resumen antes de guardar. Una vez confirmado, los datos se enviarán al
+          backend de llantera-hex.
+        </p>
+        <pre
+          class="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap bg-gray-50 dark:bg-[#15203c] rounded-md p-[12px] mt-[8px]">{{ confirmText() }}</pre>
+      </div>
+      <div
+        class="trezo-card-footer flex items-center justify-between -mx-[20px] md:-mx-[25px] px-[20px] md:px-[25px] pt-[20px] md:pt-[25px] border-t border-gray-100 dark:border-[#172036]">
+        <button type="button"
+          class="inline-block py-[10px] px-[30px] bg-danger-500 text-white transition-all hover:bg-danger-400 rounded-md border border-danger-500 hover:border-danger-400"
+          (click)="closeConfirmModal()">
+          Cancelar
+        </button>
+        <button type="button"
+          class="inline-block py-[10px] px-[30px] bg-primary-500 text-white transition-all hover:bg-primary-400 rounded-md border border-primary-500 hover:border-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="confirmSave()" [disabled]="saving()">
+          Confirmar y guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}

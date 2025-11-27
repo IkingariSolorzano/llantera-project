@@ -1,0 +1,99 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">{{ pageTitle() }}</h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px]">
+      <a routerLink="/dashboard" class="inline-block relative ltr:pl-[22px] transition-all hover:text-primary-500">
+        <i class="material-symbols-outlined absolute ltr:left-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2">
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px]">Usuarios</li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px]">Detalle</li>
+  </ol>
+</div>
+
+@if (loading()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md text-gray-500 dark:text-gray-400">
+    Cargando información del usuario...
+  </div>
+} @else if (error()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md text-danger-500">
+    {{ error() }}
+  </div>
+} @else if (usuario()) {
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[25px] rounded-md">
+    <div class="trezo-card-content">
+      <div class="flex items-start gap-[18px]">
+        <div class="rounded-full w-[70px] h-[70px] bg-gray-100 dark:bg-[#172036] flex items-center justify-center text-primary-500 font-semibold uppercase text-2xl">
+          {{ (usuario()?.name || usuario()?.email || '?')[0] }}
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold text-black dark:text-white mb-[4px]">{{ usuario()?.name || usuario()?.email }}</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{{ usuario()?.email }}</p>
+          <span class="inline-flex items-center rounded-full text-xs px-[10px] py-[3px] mt-[10px]"
+            [ngClass]="usuario()?.active ? 'text-success-500 bg-success-50' : 'text-warning-500 bg-warning-50'">
+            {{ usuario()?.active ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-[18px] mt-[25px] text-sm">
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 uppercase text-[12px]">Nombre</p>
+          <p class="text-black dark:text-white font-medium">
+            {{ usuario()?.firstName }} {{ usuario()?.firstLastName }} {{ usuario()?.secondLastName }}
+          </p>
+        </div>
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 uppercase text-[12px]">Rol</p>
+          <p class="text-black dark:text-white font-medium">{{ formatRole(usuario()) }}</p>
+        </div>
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 uppercase text-[12px]">Nivel</p>
+          <p class="text-black dark:text-white font-medium">{{ formatNivel(usuario()) }}</p>
+        </div>
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 uppercase text-[12px]">Teléfono</p>
+          <p class="text-black dark:text-white font-medium">{{ usuario()?.phone || 'Sin teléfono' }}</p>
+        </div>
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 uppercase text-[12px]">Empresa</p>
+          <p class="text-black dark:text-white font-medium">
+            @if (usuario()?.companyId) {
+              {{ company()?.socialReason || ('Empresa #' + usuario()?.companyId) }}
+            } @else {
+              Sin asignar
+            }
+          </p>
+        </div>
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 uppercase text-[12px]">Creado</p>
+          <p class="text-black dark:text-white font-medium">{{ usuario()?.createdAt | date: 'medium' }}</p>
+        </div>
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 uppercase text-[12px]">Actualizado</p>
+          <p class="text-black dark:text-white font-medium">{{ usuario()?.updatedAt | date: 'medium' }}</p>
+        </div>
+      </div>
+
+      <div class="mt-[25px] flex flex-wrap gap-[12px]">
+        <button
+          type="button"
+          class="px-[18px] py-[10px] rounded-md bg-gray-100 dark:bg-[#172036] text-gray-700 dark:text-white font-medium"
+          (click)="goBack()"
+        >
+          Regresar
+        </button>
+        <button
+          type="button"
+          class="px-[18px] py-[10px] rounded-md bg-primary-500 text-white font-medium hover:bg-primary-400"
+          (click)="goToEdit()"
+        >
+          Editar usuario
+        </button>
+      </div>
+    </div>
+  </div>
+}

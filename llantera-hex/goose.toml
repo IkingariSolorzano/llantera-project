@@ -1,0 +1,4 @@
+[goose]
+dir = "migrations"
+table = "schema_migrations"
+verbose = true

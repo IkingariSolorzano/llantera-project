@@ -1,0 +1,9 @@
+<div class="counter-container relative w-[102px]" id="inputCounter">
+    <button (click)="decrement()" class="decrease-btn top-1/2 -translate-y-1/2 absolute text-[20px] ltr:left-[17px] rtl:right-[17px] text-gray-500 dark:text-gray-400 transition-all hover:text-primary-500">
+        -
+    </button>
+    <input type="text" class="counter text-base h-[34px] rounded-md text-center block w-full bg-primary-50 dark:bg-[#15203c] text-black outline-0 font-medium dark:text-white" [(ngModel)]="value" readonly />
+    <button (click)="increment()" class="increase-btn top-1/2 -translate-y-1/2 absolute text-[20px] ltr:right-[17px] rtl:left-[17px] text-gray-500 dark:text-gray-400 transition-all hover:text-primary-500">
+        +
+    </button>
+</div>

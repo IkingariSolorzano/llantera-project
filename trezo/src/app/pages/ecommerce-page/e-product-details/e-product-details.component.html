@@ -1,0 +1,562 @@
+<!-- Breadcrumb -->
+<div class="mb-[25px] md:flex items-center justify-between">
+    <h5 class="mb-0">
+        Product Details
+    </h5>
+    <ol class="breadcrumb mt-[12px] md:mt-0">
+        <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+            <a routerLink="/dashboard" class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500">
+                <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2">
+                    home
+                </i>
+                Dashboard
+            </a>
+        </li>
+        <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+            eCommerce
+        </li>
+        <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+            Products
+        </li>
+        <li class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0">
+            Product Details
+        </li>
+    </ol>
+</div>
+
+<!-- Product Details -->
+<div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+    <div class="trezo-card-content lg:max-w-[1070px] md:pt-[15px] md:px-[15px] md:pb-[75px]">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-[25px]">
+            <div class="lg:ltr:mr-[30px] lg:rtl:ml-[30px]">
+                <owl-carousel-o [options]="{items: 1, dots: false, animateIn: 'fadeIn', animateOut: 'fadeOut'}" #owlCar>
+                    <ng-container *ngFor="let image of productImages">
+                        <ng-template carouselSlide [id]="image.url">
+                            <img [src]="image.url" [alt]="image.url" class="rounded-md">
+                        </ng-template>
+                    </ng-container>
+                </owl-carousel-o>
+                <div class="mt-[20px] md:mt-[25px]">
+                    <owl-carousel-o [options]="{items: 3, dots: false, margin: 25}">
+                        <ng-container *ngFor="let image of productImages; let i = index">
+                            <ng-template carouselSlide [id]="image.url+i"  [width]="130">
+                                <a
+                                    (click)="owlCar.to(image.url); changeImage(image.url+i)"
+                                    class="rounded-md cursor-pointer"
+                                >
+                                    <img [src]="image.url" [alt]="image.url" class="rounded-md">
+                                </a>
+                            </ng-template>
+                        </ng-container>
+                    </owl-carousel-o>
+                </div>
+            </div>
+            <div>
+                <span class="inline-block text-xs relative rounded-sm text-success-700 mb-[14px] bg-success-50 py-[4px] ltr:pr-[16px] rtl:pl-[16px] ltr:pl-[37px] rtl:pr-[37px]">
+                    <i class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 ltr:left-[12px] rtl:right-[12px] mt-[.2px] !text-[19px]">
+                        check
+                    </i>
+                    in stock
+                </span>
+                <h6 class="font-medium text-lg leading-[1.5] mb-[16px]">
+                    Apple MacBook Pro 16.2" with Liquid Retina XDR Display, M2 Max Chip with 12-Core CPU
+                </h6>
+                <div class="leading-none border-b border-gray-100 dark:border-[#172036] pb-[20px] md:pb-[25px] mb-[21px] text-md text-warning-500 flex items-center">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 relative top-[2px] ltr:ml-[15px] rtl:mr-[15px]">
+                        (76 reviews)
+                    </span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-black dark:text-white font-bold text-lg">
+                        $3,499
+                    </span>
+                    <span class="text-md ltr:ml-[7px] rtl:mr-[7px] line-through">
+                        $3,799
+                    </span>
+                </div>
+                <div class="mt-[20px]">
+                    <div class="flex items-center">
+                        <span>
+                            Style:
+                        </span>
+                        <span class="font-medium text-black dark:text-white ltr:ml-[3px] rtl:mr-[3px]">
+                            Apple M1 Pro Chip
+                        </span>
+                    </div>
+                    <div class="mt-[7px]">
+                        <button type="button" class="inline-block text-xs py-[4px] px-[15px] rounded-[4px] ltr:mr-[10px] rtl:ml-[10px] border border-gray-100 dark:border-[#172036]">
+                            Apple M1 Max Chip
+                        </button>
+                        <button type="button" class="inline-block text-xs py-[4px] px-[15px] rounded-[4px] ltr:mr-[10px] rtl:ml-[10px] border border-orange-400 text-black dark:text-white font-semibold">
+                            Apple M1 Pro Chip
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-[15px]">
+                    <div class="flex items-center">
+                        <span>
+                            Capacity:
+                        </span>
+                        <span class="font-medium text-black dark:text-white ltr:ml-[3px] rtl:mr-[3px]">
+                            1 TB
+                        </span>
+                    </div>
+                    <div class="mt-[6px]">
+                        <button type="button" class="inline-block text-xs py-[4px] px-[15px] rounded-[4px] ltr:mr-[10px] rtl:ml-[10px] border border-gray-100 dark:border-[#172036]">
+                            512 GB
+                        </button>
+                        <button type="button" class="inline-block text-xs py-[4px] px-[15px] rounded-[4px] ltr:mr-[10px] rtl:ml-[10px] border border-orange-400 text-black dark:text-white font-semibold">
+                            1 TB
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-[15px]">
+                    <div class="flex items-center">
+                        <span>
+                            Color:
+                        </span>
+                        <span class="font-medium text-black dark:text-white ltr:ml-[3px] rtl:mr-[3px]">
+                            Silver
+                        </span>
+                    </div>
+                    <div class="mt-[6px]">
+                        <button type="button" class="inline-block ltr:mr-[10px] rtl:ml-[10px] rounded-full w-[29px] h-[29px] bg-gray-100 border border-orange-400"></button>
+                        <button type="button" class="inline-block ltr:mr-[10px] rtl:ml-[10px] rounded-full w-[29px] h-[29px] bg-gray-200 border border-gray-200"></button>
+                    </div>
+                </div>
+                <div class="mt-[26px] flex items-center gap-[8px]">
+                    <app-quantity-counter [initialValue]="1" />
+                    <button type="button" class="rounded-md inline-block font-medium py-[6.5px] px-[21px] text-white bg-primary-500">
+                        <span class="inline-block relative ltr:pl-[24px] rtl:pr-[24px]">
+                            <i class="ri-shopping-cart-line absolute ltr:left-0 rtl:right-0 text-[17px] top-1/2 -translate-y-1/2"></i>
+                            Add To Cart
+                        </span>
+                    </button>
+                </div>
+                <button type="button" class="mt-[20px] inline-block font-medium text-black dark:text-white">
+                    <span class="flex items-center">
+                        <i class="ri-heart-line w-[31px] h-[31px] text-lg text-gray-500 dark:text-gray-400 leading-[33px] text-center ltr:mr-[10px] rtl:ml-[10px] rounded-full inline-block bg-gray-100 dark:bg-[#172036]"></i>
+                        Add to wishlist
+                    </span>
+                </button>
+                <div class="mt-[11px] flex items-center">
+                    <i class="material-symbols-outlined w-[31px] h-[31px] !text-lg text-gray-500 dark:text-gray-400 !leading-[33px] text-center ltr:mr-[10px] rtl:ml-[10px] rounded-full inline-block bg-gray-100 dark:bg-[#172036]">
+                        visibility
+                    </i>
+                    565 people are viewing the products
+                </div>
+                <ul class="my-[19px] border-t border-b border-gray-100 py-[15px] dark:border-[#172036]">
+                    <li class="relative ltr:pl-[27px] rtl:pr-[27px] mb-[7px] last:mb-0 text-black dark:text-white">
+                        <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 top-1/2 -translate-y-1/2 !text-[20px] text-success-700">
+                            check
+                        </i>
+                        Free delivery today
+                    </li>
+                    <li class="relative ltr:pl-[27px] rtl:pr-[27px] mb-[7px] last:mb-0 text-black dark:text-white">
+                        <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 top-1/2 -translate-y-1/2 !text-[20px] text-success-700">
+                            check
+                        </i>
+                        100% money back Guarantee
+                    </li>
+                    <li class="relative ltr:pl-[27px] rtl:pr-[27px] mb-[7px] last:mb-0 text-black dark:text-white">
+                        <i class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 top-1/2 -translate-y-1/2 !text-[20px] text-success-700">
+                            check
+                        </i>
+                        7 days product return policy
+                    </li>
+                </ul>
+                <ul class="mb-[20px]">
+                    <li class="mb-[6px] last:mb-0">
+                        SKU:
+                        <span class="font-medium text-black dark:text-white">
+                            SMTGS6T45
+                        </span>
+                    </li>
+                    <li class="mb-[6px] last:mb-0">
+                        Category:
+                        <span class="font-medium text-black dark:text-white">
+                            computer
+                        </span>
+                    </li>
+                    <li class="mb-[6px] last:mb-0">
+                        Tags:
+                        <span class="font-medium text-black dark:text-white">
+                            laptop, macbook, PC
+                        </span>
+                    </li>
+                </ul>
+                <div class="flex items-center gap-[4px]">
+                    <span class="relative text-md ltr:mr-[5px] rtl:ml-[5px] -top-px">
+                        Share:
+                    </span>
+                    <a href="#" class="w-[23.844px] h-[23.844px] text-sm leading-[23.844px] text-black dark:text-white bg-gray-100 dark:bg-[#172036] rounded-full text-center transition-all hover:text-white hover:bg-primary-500" target="_blank">
+                        <i class="ri-facebook-fill"></i>
+                    </a>
+                    <a href="#" class="w-[23.844px] h-[23.844px] text-sm leading-[23.844px] text-black dark:text-white bg-gray-100 dark:bg-[#172036] rounded-full text-center transition-all hover:text-white hover:bg-primary-500" target="_blank">
+                        <i class="ri-twitter-x-fill"></i>
+                    </a>
+                    <a href="#" class="w-[23.844px] h-[23.844px] text-sm leading-[23.844px] text-black dark:text-white bg-gray-100 dark:bg-[#172036] rounded-full text-center transition-all hover:text-white hover:bg-primary-500" target="_blank">
+                        <i class="ri-linkedin-fill"></i>
+                    </a>
+                    <a href="#" class="w-[23.844px] h-[23.844px] text-sm leading-[23.844px] text-black dark:text-white bg-gray-100 dark:bg-[#172036] rounded-full text-center transition-all hover:text-white hover:bg-primary-500" target="_blank">
+                        <i class="ri-whatsapp-line"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Description, Specifications, & Reviews -->
+<div class="product-details-tabs">
+    <ul class="navs" role="tablist">
+        <li class="nav-item inline-block" [ngClass]="{'active': currentTab === 'tab1'}">
+            <button type="button" class="nav-link block md:text-md py-[10px] md:py-[12px] px-[15px] md:px-[20px] transition-all relative font-medium rounded-t-md" (click)="switchTab($event, 'tab1')">
+                Description
+            </button>
+        </li>
+        <li class="nav-item inline-block" [ngClass]="{'active': currentTab === 'tab2'}">
+            <button type="button" class="nav-link block md:text-md py-[10px] md:py-[12px] px-[15px] md:px-[20px] transition-all relative font-medium rounded-t-md" (click)="switchTab($event, 'tab2')">
+                Specifications
+            </button>
+        </li>
+        <li class="nav-item inline-block" [ngClass]="{'active': currentTab === 'tab3'}">
+            <button type="button" class="nav-link block md:text-md py-[10px] md:py-[12px] px-[15px] md:px-[20px] transition-all relative font-medium rounded-t-md" (click)="switchTab($event, 'tab3')">
+                Reviews
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade" id="tab1" *ngIf="currentTab === 'tab1'">
+            <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+                <div class="trezo-card-content">
+                    <p>
+                        The Apple MacBook Pro 16.2 is a cutting-edge laptop designed to deliver exceptional performance and advanced features for professionals and creative enthusiasts. With its sleek aluminum body and precision engineering, this MacBook Pro represents the pinnacle of Apple's laptop technology.
+                    </p>
+                    <p>
+                        Stay connected with a variety of ports, including Thunderbolt 3, USB-C, and audio jacks. These versatile ports support high-speed data transfer and external device connections. Enjoy a rich audio experience with high-fidelity speakers that deliver clear and immersive sound. Perfect for content creators and multimedia enthusiasts.
+                    </p>
+                    <p>
+                        Equipped with the latest processors, ample RAM, and high-performance graphics, the MacBook Pro 16.2 ensures smooth multitasking, fast rendering, and efficient handling of resource-intensive tasks. Seamlessly integrate with the macOS ecosystem, benefiting from features like iCloud, Siri, and a vast selection of applications available on the App Store.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="tab2" *ngIf="currentTab === 'tab2'">
+            <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+                <div class="trezo-card-content">
+                    <h6 class="font-semibold mb-[12px] text-[15px]">
+                        General
+                    </h6>
+                    <ul>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Brand:
+                            </span>
+                            Apple
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Model:
+                            </span>
+                            MacBook Pro
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Price:
+                            </span>
+                            $2499
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Dimensions (mm):
+                            </span>
+                            304.10 x 212.40 x 14.90
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Weight (kg):
+                            </span>
+                            1.37
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Colors:
+                            </span>
+                            Space Grey
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Operating system:
+                            </span>
+                            macOS
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Battery Life (up to hours):
+                            </span>
+                            10
+                        </li>
+                    </ul>
+                    <h6 class="font-semibold mb-[12px] mt-[20px] md:mt-[25px] text-[15px]">
+                        Display
+                    </h6>
+                    <ul>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Size:
+                            </span>
+                            13.30-inch
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Resolution:
+                            </span>
+                            2560x1600 pixels
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Touch Screen:
+                            </span>
+                            No
+                        </li>
+                    </ul>
+                    <h6 class="font-semibold mb-[12px] mt-[20px] md:mt-[25px] text-[15px]">
+                        Processor
+                    </h6>
+                    <ul>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Processor:
+                            </span>
+                            Intel Core i5 7th Gen
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Base Clock Speed:
+                            </span>
+                            2.3 GHz
+                        </li>
+                    </ul>
+                    <h6 class="font-semibold mb-[12px] mt-[20px] md:mt-[25px] text-[15px]">
+                        Memory
+                    </h6>
+                    <ul>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                RAM:
+                            </span>
+                            12GB
+                        </li>
+                    </ul>
+                    <h6 class="font-semibold mb-[12px] mt-[20px] md:mt-[25px] text-[15px]">
+                        Storage
+                    </h6>
+                    <ul>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Hard disk:
+                            </span>
+                            No
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                SSD:
+                            </span>
+                            512GB
+                        </li>
+                    </ul>
+                    <h6 class="font-semibold mb-[12px] mt-[20px] md:mt-[25px] text-[15px]">
+                        Connectivity
+                    </h6>
+                    <ul>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Wi-Fi standards supported:
+                            </span>
+                            Apple
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Bluetooth version:
+                            </span>
+                            4.2
+                        </li>
+                    </ul>
+                    <h6 class="font-semibold mb-[12px] mt-[20px] md:mt-[25px] text-[15px]">
+                        Inputs
+                    </h6>
+                    <ul>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Web Camera:
+                            </span>
+                            Yes
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Pointer Device:
+                            </span>
+                            Touchpad
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Touchpad:
+                            </span>
+                            Yes
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Internal Mic:
+                            </span>
+                            Yes
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Speakers:
+                            </span>
+                            Stereo Speakers
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Finger Print Sensor:
+                            </span>
+                            Yes
+                        </li>
+                    </ul>
+                    <h6 class="font-semibold mb-[12px] mt-[20px] md:mt-[25px] text-[15px]">
+                        Ports and slots
+                    </h6>
+                    <ul>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Number of USB Ports:
+                            </span>
+                            2
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                USB Ports:
+                            </span>
+                            2 x USB 3.0
+                        </li>
+                        <li class="py-[11px] px-[20px] border-b border-l border-r border-gray-100 dark:border-[#172036] first:border-t">
+                            <span class="text-black dark:text-white">
+                                Mic In:
+                            </span>
+                            Yes
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="tab3" *ngIf="currentTab === 'tab3'">
+            <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+                <div class="trezo-card-content">
+                    <div class="md:grid md:grid-cols-3 gap-[25px] items-center">
+                        <div class="md:col-span-2">
+                            <div class="flex items-center relative gap-[15px] mb-[15px] ltr:pr-[48px] rtl:pl-[48px] last:mb-0">
+                                <div class="flex items-center justify-center text-[#ee8336] text-lg gap-[5px]">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                </div>
+                                <div class="flex w-full h-[4px] overflow-hidden rounded-md bg-primary-50 dark:bg-[#172036]">
+                                    <div class="flex flex-col justify-center overflow-hidden bg-primary-500 rounded-md" style="width: 85%;"></div>
+                                </div>
+                                <span class="absolute ltr:right-0 rtl:left-0 top-1/2 -translate-y-1/2">
+                                    359
+                                </span>
+                            </div>
+                            <div class="flex items-center relative gap-[15px] mb-[15px] ltr:pr-[48px] rtl:pl-[48px] last:mb-0">
+                                <div class="flex items-center justify-center text-[#ee8336] text-lg gap-[5px]">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                </div>
+                                <div class="flex w-full h-[4px] overflow-hidden rounded-md bg-primary-50 dark:bg-[#172036]">
+                                    <div class="flex flex-col justify-center overflow-hidden bg-primary-500 rounded-md" style="width: 50%;"></div>
+                                </div>
+                                <span class="absolute ltr:right-0 rtl:left-0 top-1/2 -translate-y-1/2">
+                                    208
+                                </span>
+                            </div>
+                            <div class="flex items-center relative gap-[15px] mb-[15px] ltr:pr-[48px] rtl:pl-[48px] last:mb-0">
+                                <div class="flex items-center justify-center text-[#ee8336] text-lg gap-[5px]">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                </div>
+                                <div class="flex w-full h-[4px] overflow-hidden rounded-md bg-primary-50 dark:bg-[#172036]">
+                                    <div class="flex flex-col justify-center overflow-hidden bg-primary-500 rounded-md" style="width: 35%;"></div>
+                                </div>
+                                <span class="absolute ltr:right-0 rtl:left-0 top-1/2 -translate-y-1/2">
+                                    124
+                                </span>
+                            </div>
+                            <div class="flex items-center relative gap-[15px] mb-[15px] ltr:pr-[48px] rtl:pl-[48px] last:mb-0">
+                                <div class="flex items-center justify-center text-[#ee8336] text-lg gap-[5px]">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                </div>
+                                <div class="flex w-full h-[4px] overflow-hidden rounded-md bg-primary-50 dark:bg-[#172036]">
+                                    <div class="flex flex-col justify-center overflow-hidden bg-primary-500 rounded-md" style="width: 15%;"></div>
+                                </div>
+                                <span class="absolute ltr:right-0 rtl:left-0 top-1/2 -translate-y-1/2">
+                                    89
+                                </span>
+                            </div>
+                            <div class="flex items-center relative gap-[15px] mb-[15px] ltr:pr-[48px] rtl:pl-[48px] last:mb-0">
+                                <div class="flex items-center justify-center text-[#ee8336] text-lg gap-[5px]">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                </div>
+                                <div class="flex w-full h-[4px] overflow-hidden rounded-md bg-primary-50 dark:bg-[#172036]">
+                                    <div class="flex flex-col justify-center overflow-hidden bg-primary-500 rounded-md" style="width: 5%;"></div>
+                                </div>
+                                <span class="absolute ltr:right-0 rtl:left-0 top-1/2 -translate-y-1/2">
+                                    4
+                                </span>
+                            </div>
+                        </div>
+                        <div class="md:col-span-1">
+                            <div class="text-center mt-[25px] md:mt-0">
+                                <h3 class="mb-[7px] leading-none text-5xl">
+                                    4.28
+                                </h3>
+                                <div class="flex items-center justify-center mb-[10px] text-[#ee8336] text-[30px] gap-[4px]">
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-fill"></i>
+                                    <i class="ri-star-line text-[#e2e8f0] dark:text-[#334161]"></i>
+                                </div>
+                                <span class="block">
+                                    of 3250 Reviews
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <app-pd-manage-reviews />
+        </div>
+    </div>
+</div>

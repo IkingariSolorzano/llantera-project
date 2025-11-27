@@ -1,0 +1,312 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0 text-lg font-semibold text-gray-900 dark:text-white">
+    Gestión de Pedidos
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li class="breadcrumb-item inline-block relative text-sm mx-[11px]">
+      <a routerLink="/dashboard" class="inline-block relative transition-all hover:text-primary-500">
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[11px]">
+      Pedidos
+    </li>
+  </ol>
+</div>
+
+<!-- Loading y Error -->
+@if (loading()) {
+  <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-8 text-center mb-6">
+    <div class="animate-spin w-8 h-8 border-4 border-[#E60012] border-t-transparent rounded-full mx-auto mb-3"></div>
+    <p class="text-sm text-gray-500">Cargando pedidos...</p>
+  </div>
+}
+@if (error()) {
+  <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 flex items-center gap-3">
+    <i class="material-symbols-outlined text-red-500">error</i>
+    <span class="text-sm text-red-600 dark:text-red-400">{{ error() }}</span>
+    <button type="button" (click)="loadOrders()" class="ml-auto px-3 py-1 bg-red-600 text-white text-xs rounded-lg">Reintentar</button>
+  </div>
+}
+
+<!-- Barra de búsqueda -->
+<div class="mb-4 flex gap-3">
+  <div class="flex-1 relative">
+    <i class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-[20px]">search</i>
+    <input
+      type="text"
+      placeholder="Buscar por número de pedido o cliente..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+      (keyup.enter)="onSearch()"
+      class="w-full h-11 pl-10 pr-4 rounded-lg border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#0c1427] text-sm text-gray-900 dark:text-white focus:border-[#E60012] outline-none"
+    />
+  </div>
+  <button type="button" (click)="onSearch()" class="px-4 h-11 bg-[#E60012] text-white rounded-lg text-sm font-medium hover:bg-red-700">
+    Buscar
+  </button>
+</div>
+
+<!-- Filtros por estado -->
+<div class="mb-6 flex flex-wrap gap-2">
+  <button
+    type="button"
+    (click)="setFilter('todos')"
+    class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+    [ngClass]="filterEstado() === 'todos'
+      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+      : 'bg-white dark:bg-[#0c1427] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#172036] hover:bg-gray-50'"
+  >
+    Todos ({{ getTotalPedidosActivos() }})
+  </button>
+  @for (estado of estadosDisponibles; track estado) {
+    <button
+      type="button"
+      (click)="setFilter(estado)"
+      class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+      [ngClass]="filterEstado() === estado
+        ? estadoConfig[estado].bgColor + ' ' + estadoConfig[estado].color
+        : 'bg-white dark:bg-[#0c1427] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-[#172036] hover:bg-gray-50'"
+    >
+      <i class="material-symbols-outlined !text-[16px]">{{ estadoConfig[estado].icon }}</i>
+      {{ estadoConfig[estado].label }} ({{ getConteoEstado(estado) }})
+    </button>
+  }
+</div>
+
+<div class="grid lg:grid-cols-3 gap-6">
+  <!-- Lista de pedidos -->
+  <div class="lg:col-span-2 space-y-4">
+    @if (filteredPedidos().length === 0) {
+      <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-12 text-center">
+        <i class="material-symbols-outlined !text-[64px] text-gray-300 dark:text-gray-600 mb-4">inbox</i>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Sin pedidos</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          No hay pedidos con el filtro seleccionado.
+        </p>
+      </div>
+    } @else {
+      @for (pedido of filteredPedidos(); track pedido.id) {
+        <button
+          type="button"
+          (click)="openDetail(pedido)"
+          class="w-full text-left bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-5 hover:border-[#E60012]/40 hover:shadow-md transition-all"
+          [class.ring-2]="selectedPedido()?.id === pedido.id"
+          [class.ring-[#E60012]]="selectedPedido()?.id === pedido.id"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <p class="text-base font-semibold text-gray-900 dark:text-white">
+                  {{ pedido.orderNumber }}
+                </p>
+                <span
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium"
+                  [ngClass]="estadoConfig[pedido.status].bgColor + ' ' + estadoConfig[pedido.status].color"
+                >
+                  <i class="material-symbols-outlined !text-[14px]">{{ estadoConfig[pedido.status].icon }}</i>
+                  {{ estadoConfig[pedido.status].label }}
+                </span>
+              </div>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                <span class="font-medium">Pedido #{{ pedido.id }}</span>
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                {{ formatDate(pedido.createdAt) }} · {{ (pedido.items || []).length }} productos
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="text-lg font-bold text-gray-900 dark:text-white">
+                ${{ formatPrice(pedido.total) }}
+              </p>
+              <p class="text-xs text-gray-500 mt-1">{{ getMetodoPagoLabel(pedido.paymentMethod) }} · {{ getModalidadPagoLabel(pedido.paymentMode) }}</p>
+              @if (pedido.requiresInvoice) {
+                <span class="inline-flex items-center gap-1 text-xs text-blue-600 mt-1">
+                  <i class="material-symbols-outlined !text-[14px]">receipt_long</i>
+                  Factura
+                </span>
+              }
+            </div>
+          </div>
+        </button>
+      }
+    }
+  </div>
+
+  <!-- Panel de detalle -->
+  <div class="bg-white dark:bg-[#0c1427] rounded-xl border border-gray-200 dark:border-[#172036] p-5 h-fit sticky top-[100px]">
+    @if (selectedPedido(); as pedido) {
+      <div class="flex items-start justify-between gap-2 mb-4">
+        <div>
+          <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.orderNumber }}</p>
+          <p class="text-xs text-gray-500">{{ formatDate(pedido.createdAt) }}</p>
+        </div>
+        <button type="button" (click)="closeDetail()" class="p-1 hover:bg-gray-100 dark:hover:bg-[#15203c] rounded-lg">
+          <i class="material-symbols-outlined !text-[20px] text-gray-400">close</i>
+        </button>
+      </div>
+
+      <!-- Estado actual y acciones -->
+      <div class="mb-4 p-3 rounded-lg" [ngClass]="estadoConfig[pedido.status].bgColor">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2" [ngClass]="estadoConfig[pedido.status].color">
+            <i class="material-symbols-outlined !text-[20px]">{{ estadoConfig[pedido.status].icon }}</i>
+            <span class="font-medium">{{ estadoConfig[pedido.status].label }}</span>
+          </div>
+          @if (getSiguienteEstado(pedido.status); as siguiente) {
+            <button
+              type="button"
+              (click)="cambiarEstado(pedido, siguiente)"
+              class="px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-xs font-medium rounded-lg shadow-sm hover:shadow-md transition-all"
+            >
+              Pasar a {{ estadoConfig[siguiente].label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Cliente -->
+      <div class="mb-4 pb-4 border-b border-gray-200 dark:border-[#172036]">
+        <p class="text-xs font-medium text-gray-500 uppercase mb-2">Cliente</p>
+        <p class="text-sm font-medium text-gray-900 dark:text-white">Usuario #{{ pedido.userId }}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Tel: {{ pedido.shippingAddress.phone }}</p>
+      </div>
+
+      <!-- Productos -->
+      <div class="mb-4 pb-4 border-b border-gray-200 dark:border-[#172036]">
+        <p class="text-xs font-medium text-gray-500 uppercase mb-2">Productos</p>
+        <div class="space-y-3 max-h-48 overflow-y-auto">
+          @for (item of (pedido.items || []); track item.tireSku) {
+            <div class="flex items-start gap-3 pb-2 border-b border-gray-100 dark:border-[#172036] last:border-0">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.tireMeasure }}</p>
+                <p class="text-xs text-gray-500">SKU: {{ item.tireSku }}</p>
+                <p class="text-xs text-gray-500 mt-0.5">
+                  Precio unit: <span class="text-gray-700 dark:text-gray-300">${{ formatPrice(item.unitPrice) }}</span>
+                </p>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="text-lg font-bold text-gray-900 dark:text-white">x{{ item.quantity }}</p>
+                <p class="text-sm font-semibold text-[#E60012]">${{ formatPrice(item.subtotal) }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Totales -->
+      <div class="mb-4 pb-4 border-b border-gray-200 dark:border-[#172036] space-y-1 text-sm">
+        <div class="flex justify-between">
+          <span class="text-gray-500">Subtotal</span>
+          <span class="text-gray-900 dark:text-white">${{ formatPrice(pedido.subtotal) }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">Envío</span>
+          <span class="text-gray-900 dark:text-white">${{ formatPrice(pedido.shippingCost) }}</span>
+        </div>
+        <div class="flex justify-between font-bold text-base pt-1">
+          <span class="text-gray-900 dark:text-white">Total</span>
+          <span class="text-[#E60012]">${{ formatPrice(pedido.total) }}</span>
+        </div>
+      </div>
+
+      <!-- Dirección -->
+      <div class="mb-4 pb-4 border-b border-gray-200 dark:border-[#172036]">
+        <p class="text-xs font-medium text-gray-500 uppercase mb-2">Dirección de envío</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDireccion(pedido) }}</p>
+      </div>
+
+      <!-- Pago -->
+      <div class="mb-4">
+        <p class="text-xs font-medium text-gray-500 uppercase mb-2">Método de pago</p>
+        <p class="text-sm text-gray-900 dark:text-white">{{ getMetodoPagoLabel(pedido.paymentMethod) }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          {{ getModalidadPagoLabel(pedido.paymentMode) }}
+          @if (pedido.paymentMode === 'parcialidades' && pedido.paymentInstallments) {
+            <span class="font-medium">({{ pedido.paymentInstallments }} meses)</span>
+          }
+        </p>
+      </div>
+
+      <!-- Facturación -->
+      @if (pedido.requiresInvoice && pedido.billingInfo) {
+        <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <p class="text-xs font-medium text-blue-700 dark:text-blue-400 uppercase mb-2 flex items-center gap-1">
+            <i class="material-symbols-outlined !text-[14px]">receipt_long</i>
+            Datos de facturación
+          </p>
+          <p class="text-sm text-gray-900 dark:text-white">{{ pedido.billingInfo.rfc }}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">{{ pedido.billingInfo.razonSocial }}</p>
+        </div>
+      }
+
+      <!-- Acciones adicionales -->
+      <div class="mt-4 pt-4 border-t border-gray-200 dark:border-[#172036] flex gap-2">
+        @if (pedido.status !== 'cancelado' && pedido.status !== 'entregado') {
+          <button
+            type="button"
+            (click)="cambiarEstado(pedido, 'cancelado')"
+            class="flex-1 px-3 py-2 border border-red-300 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors"
+          >
+            Cancelar pedido
+          </button>
+        }
+        <button
+          type="button"
+          (click)="downloadComprobante(pedido)"
+          class="flex-1 px-3 py-2 bg-gray-100 dark:bg-[#15203c] text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-[#1a2744] transition-colors flex items-center justify-center gap-1"
+        >
+          <i class="material-symbols-outlined !text-[16px]">picture_as_pdf</i>
+          Comprobante
+        </button>
+      </div>
+    } @else {
+      <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+        <i class="material-symbols-outlined !text-[48px] opacity-50 mb-2">touch_app</i>
+        <p class="text-sm">Selecciona un pedido para ver el detalle</p>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal de Confirmación de Cancelación -->
+@if (showCancelModal()) {
+  <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); padding: 16px;">
+    <div style="background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+      <div style="width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: #FEE2E2; display: flex; align-items: center; justify-content: center;">
+        <i class="material-symbols-outlined" style="font-size: 28px; color: #EF4444;">warning</i>
+      </div>
+      <h3 style="font-size: 18px; font-weight: 700; color: #111827; text-align: center; margin-bottom: 8px;">¿Cancelar pedido?</h3>
+      <p style="font-size: 14px; color: #6B7280; text-align: center; margin-bottom: 4px;">
+        Estás a punto de cancelar el pedido:
+      </p>
+      @if (pedidoToCancel(); as pedido) {
+        <p style="font-size: 14px; font-weight: 600; color: #E60012; text-align: center; margin-bottom: 12px;">Pedido #{{ pedido.id }}</p>
+      }
+      <p style="font-size: 12px; color: #9CA3AF; text-align: center; margin-bottom: 20px;">
+        Esta acción no se puede deshacer.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button
+          type="button"
+          (click)="confirmCancelOrder()"
+          [disabled]="cancelling()"
+          style="width: 100%; padding: 14px 16px; background: #DC2626; color: white; font-weight: 600; font-size: 14px; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"
+        >
+          @if (cancelling()) {
+            <div style="width: 16px; height: 16px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          }
+          Sí, cancelar pedido
+        </button>
+        <button
+          type="button"
+          (click)="closeCancelModal()"
+          [disabled]="cancelling()"
+          style="width: 100%; padding: 14px 16px; background: #F3F4F6; color: #374151; font-weight: 600; font-size: 14px; border: none; border-radius: 12px; cursor: pointer;"
+        >
+          No, mantener pedido
+        </button>
+      </div>
+    </div>
+  </div>
+}

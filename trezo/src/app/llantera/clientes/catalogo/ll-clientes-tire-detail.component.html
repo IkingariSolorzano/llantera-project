@@ -1,0 +1,153 @@
+<div class="mb-[25px] md:flex items-center justify-between">
+  <h5 class="mb-0">
+    Detalle de llanta
+  </h5>
+  <ol class="breadcrumb mt-[12px] md:mt-0">
+    <li
+      class="breadcrumb-item inline-block relative text-sm mx-[13px] ltr:first:ml-0 rtl:first:mr-0 ltr:last:mr-0 rtl:last:ml-0"
+    >
+      <a
+        routerLink="/dashboard"
+        class="inline-block relative ltr:pl-[22px] rtl:pr-[22px] transition-all hover:text-primary-500"
+      >
+        <i
+          class="material-symbols-outlined absolute ltr:left-0 rtl:right-0 !text-lg -mt-px text-primary-500 top-1/2 -translate-y-1/2"
+        >
+          home
+        </i>
+        Dashboard
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px]">
+      Llantas
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px]">
+      <a
+        routerLink="/dashboard/llantas/catalogo-publico"
+        class="transition-all hover:text-primary-500"
+      >
+        Catálogo público
+      </a>
+    </li>
+    <li class="breadcrumb-item inline-block relative text-sm mx-[13px]">
+      Detalle de llanta
+    </li>
+  </ol>
+</div>
+
+@if (loading()) {
+  <div
+    class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md text-gray-500 dark:text-gray-400 text-sm"
+  >
+    Cargando detalle de la llanta...
+  </div>
+} @else if (error()) {
+  <div
+    class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md text-danger-500 text-sm"
+  >
+    {{ error() }}
+  </div>
+} @else if (!item()) {
+  <div
+    class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md text-gray-500 dark:text-gray-400 text-sm"
+  >
+    No se encontró la información de la llanta. Regresa al catálogo y vuelve a
+    intentarlo.
+  </div>
+} @else {
+  @let current = item()!;
+  <div class="trezo-card bg-white dark:bg-[#0c1427] mb-[25px] p-[20px] md:p-[25px] rounded-md">
+    <div
+      class="trezo-card-content lg:max-w-[1000px] md:pt-[10px] md:px-[10px] md:pb-[30px]"
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-[20px] lg:gap-[25px]">
+        <div class="relative">
+          <img
+            [src]="getTireImage(current)"
+            [alt]="formatMedida(current.tire)"
+            class="rounded-md w-full h-[220px] md:h-[260px] object-contain bg-gray-50 dark:bg-[#0b1220]"
+          />
+          <div
+            class="absolute ltr:left-[14px] rtl:right-[14px] bottom-[14px] bg-white/90 dark:bg-[#0c1427]/95 rounded-md px-[12px] py-[8px] shadow-md text-xs md:text-sm"
+          >
+            <div class="text-gray-500 dark:text-gray-400">
+              Precio público
+            </div>
+            <div class="text-primary-500 font-semibold text-[15px] md:text-[17px]">
+              ${{ current.tire.precioPublico | number: '1.0-2' }}
+            </div>
+            <div class="text-[11px] text-gray-500 dark:text-gray-400">
+              Nivel actual: {{ current.priceCode || 'lista' }} · Precio
+              catálogo: ${{ current.price | number: '1.0-2' }}
+            </div>
+          </div>
+        </div>
+        <div>
+          <h6 class="font-medium text-[17px] leading-[1.4] mb-[10px]">
+            {{ formatMedida(current.tire) }}
+          </h6>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-[14px]">
+            {{ current.tire.descripcion || 'Sin descripción comercial.' }}
+          </p>
+
+          <div class="grid grid-cols-2 gap-[10px] text-xs md:text-sm">
+            <div class="space-y-[4px]">
+              <p><span class="font-medium">SKU:</span> {{ current.tire.sku }}</p>
+              <p>
+                <span class="font-medium">Medida original:</span>
+                {{ formatMedida(current.tire) }}
+              </p>
+              <p>
+                <span class="font-medium">Carga / Velocidad:</span>
+                {{ formatCargaVelocidad(current.tire) }}
+              </p>
+              <p>
+                <span class="font-medium">Uso:</span>
+                {{ formatUso(current.tire) }}
+              </p>
+            </div>
+            <div class="space-y-[4px]">
+              <p>
+                <span class="font-medium">Ancho:</span>
+                {{ current.tire.ancho }}
+              </p>
+              <p>
+                <span class="font-medium">Perfil:</span>
+                {{ current.tire.perfil ?? '-' }}
+              </p>
+              <p>
+                <span class="font-medium">Rin:</span>
+                {{ current.tire.rin }}
+              </p>
+              <p>
+                <span class="font-medium">Construcción:</span>
+                {{ current.tire.construccion }}
+              </p>
+              <p>
+                <span class="font-medium">Tipo de tubo:</span>
+                {{ current.tire.tipoTubo }}
+              </p>
+              <p>
+                <span class="font-medium">Capas:</span>
+                {{ current.tire.calificacionCapas || 'N/D' }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="mt-[18px] border-t border-gray-100 dark:border-[#172036] pt-[12px] text-xs md:text-sm text-gray-500 dark:text-gray-400"
+          >
+            <p>
+              <span class="font-medium">Creado:</span>
+              {{ current.tire.creadoEn | date: 'short' }}
+            </p>
+            <p>
+              <span class="font-medium">Actualizado:</span>
+              {{ current.tire.actualizadoEn | date: 'short' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

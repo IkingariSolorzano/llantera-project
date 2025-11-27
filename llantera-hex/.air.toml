@@ -1,0 +1,23 @@
+root = "."
+watchexclude_dir = ["tmp", "vendor", "bin"]
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/server.exe ./cmd/api"
+  bin = "tmp/server.exe"
+  include_ext = ["go", "mod", "sum"]
+  exclude_dir = ["tmp", "vendor"]
+  exclude_regex = ["_test.go"]
+  delay = 1000
+
+[log]
+  time = true
+
+[color]
+  main = "cyan"
+  watcher = "yellow"
+  build = "green"
+  runner = "magenta"
+
+[misc]
+  clean_on_exit = true

@@ -1,0 +1,365 @@
+<div class="flex flex-wrap items-center justify-between gap-[10px] mb-[18px]">
+  <div>
+    <h4 class="text-lg font-semibold text-black dark:text-white">
+      {{ pageTitle() }}
+    </h4>
+    <p class="mt-[4px] text-sm text-gray-500 dark:text-gray-400">
+      Administra las columnas de precio disponibles para todas las llantas.
+    </p>
+  </div>
+  <div class="flex items-center gap-[10px]">
+    <a
+      routerLink="/dashboard/llantas"
+      class="inline-flex items-center gap-[6px] px-[12px] py-[6px] rounded-md border border-gray-200 dark:border-[#172036] text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#111827]"
+    >
+      <i class="material-symbols-outlined !text-[18px]">arrow_back</i>
+      Volver a llantas
+    </a>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-[20px]">
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[20px] md:p-[22px] rounded-md lg:col-span-1">
+    <div class="flex items-center justify-between mb-[12px]">
+      <h5 class="font-semibold text-black dark:text-white mb-0">
+        @if (editingId()) {
+          Editar columna
+        } @else {
+          Nueva columna
+        }
+      </h5>
+      <button
+        type="button"
+        class="text-xs text-primary-500 hover:text-primary-400 font-medium"
+        (click)="onCreateNew()"
+      >
+        Limpiar
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-[12px]">
+      <div>
+        <label class="mb-[6px] text-black dark:text-white text-sm font-medium block">Código</label>
+        <input
+          type="text"
+          [formControl]="form.controls.code"
+          (input)="onCodeInput($event)"
+          class="h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[12px] block w-full outline-0 text-sm"
+          placeholder="Ej. lista, mayoreo, 50_descuento"
+          [readonly]="editingId() !== null"
+        />
+        @if (isInvalid('code')) {
+          <small class="text-xs text-danger-500">El código es obligatorio, no utilices espacios solo letras, numeros y guion bajo y no debe exceder 64 caracteres.</small>
+        }
+      </div>
+
+      <div>
+        <label class="mb-[6px] text-black dark:text-white text-sm font-medium block">Nombre</label>
+        <input
+          type="text"
+          [formControl]="form.controls.label"
+          class="h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[12px] block w-full outline-0 text-sm"
+          placeholder="Nombre visible de la columna"
+        />
+        @if (isInvalid('label')) {
+          <small class="text-xs text-danger-500">El nombre es obligatorio.</small>
+        }
+      </div>
+
+      <div>
+        <label class="mb-[6px] text-black dark:text-white text-sm font-medium block">Descripción</label>
+        <textarea
+          rows="2"
+          [formControl]="form.controls.description"
+          class="rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[12px] py-[8px] block w-full outline-0 text-sm resize-y"
+          placeholder="Descripción opcional de la columna de precio"
+        ></textarea>
+      </div>
+
+      <div>
+        <label class="mb-[6px] text-black dark:text-white text-sm font-medium block">Modo de cálculo</label>
+        <select
+          [formControl]="form.controls.mode"
+          class="h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[12px] block w-full outline-0 text-sm bg-white dark:bg-[#111827]"
+        >
+          <option value="fixed">Precio capturado manualmente</option>
+          <option value="derived">Calculado a partir de otra columna</option>
+        </select>
+      </div>
+
+      @if (form.controls.mode.value === 'derived') {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-[10px]">
+          <div>
+            <label class="mb-[6px] text-black dark:text-white text-sm font-medium block">Columna base</label>
+            <select
+              [formControl]="form.controls.baseCode"
+              class="h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[12px] block w-full outline-0 text-sm bg-white dark:bg-[#111827]"
+            >
+              <option value="">Selecciona columna base</option>
+              @for (baseCol of columns(); track baseCol.id) {
+                @if (baseCol.code.toLowerCase() !== (form.controls.code.value ?? '').toString().toLowerCase()) {
+                  <option [value]="baseCol.code">
+                    {{ baseCol.label || baseCol.code }}
+                  </option>
+                }
+              }
+            </select>
+          </div>
+          <div>
+            <label class="mb-[6px] text-black dark:text-white text-sm font-medium block">Operación</label>
+            <select
+              [formControl]="form.controls.operation"
+              class="h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[12px] block w-full outline-0 text-sm bg-white dark:bg-[#111827]"
+            >
+              <option value="percent">Porcentaje sobre el precio base</option>
+              <option value="add">Sumar cantidad fija</option>
+              <option value="subtract">Restar cantidad fija</option>
+              <option value="multiply">Multiplicar por factor</option>
+            </select>
+          </div>
+          <div>
+            <label class="mb-[6px] text-black dark:text-white text-sm font-medium block">Cantidad</label>
+            <input
+              type="number"
+              [formControl]="form.controls.amount"
+              class="h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[12px] block w-full outline-0 text-sm"
+              placeholder="Ej. 10 para 10% o 100 para $100"
+            />
+          </div>
+        </div>
+      }
+
+      <div class="grid grid-cols-2 gap-[10px]">
+        <div>
+          <label class="mb-[6px] text-black dark:text-white text-sm font-medium block">Orden visual</label>
+          <input
+            type="number"
+            [formControl]="form.controls.visualOrder"
+            min="0"
+            class="h-[40px] rounded-md text-black dark:text-white border border-gray-200 dark:border-[#172036] px-[12px] block w-full outline-0 text-sm"
+            placeholder="0"
+          />
+        </div>
+        <div class="flex items-center gap-[10px] mt-[22px]">
+          <label class="inline-flex items-center gap-[6px] text-sm text-gray-700 dark:text-gray-300">
+            <input type="checkbox" [formControl]="form.controls.active" class="checkbox checkbox-sm" />
+            <span>Activa</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-[10px]">
+        <label class="inline-flex items-center gap-[6px] text-sm text-gray-700 dark:text-gray-300">
+          <input type="checkbox" [formControl]="form.controls.isPublicPrice" class="checkbox checkbox-sm" />
+          <span>Usar como precio público</span>
+        </label>
+      </div>
+
+      @if (error()) {
+        <div class="text-xs text-danger-500">{{ error() }}</div>
+      }
+      @if (success()) {
+        <div class="text-xs text-success-500">{{ success() }}</div>
+      }
+
+      <div class="pt-[8px]">
+        <button
+          type="submit"
+          class="font-medium inline-flex items-center gap-[8px] transition-all rounded-md text-sm py-[8px] px-[18px] bg-primary-500 text-white hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="saving()"
+        >
+          <span>{{ submitLabel() }}</span>
+          @if (saving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="trezo-card bg-white dark:bg-[#0c1427] p-[20px] md:p-[22px] rounded-md lg:col-span-2">
+    <div class="flex items-center justify-between mb-[12px]">
+      <h5 class="font-semibold text-black dark:text-white mb-0">Listado de columnas</h5>
+      <span class="text-xs text-gray-500 dark:text-gray-400">
+        {{ columns().length }} columnas
+      </span>
+    </div>
+
+    @if (loading()) {
+      <div class="flex items-center gap-[10px] text-gray-500 dark:text-gray-400">
+        <span class="loading loading-spinner loading-md"></span>
+        Cargando columnas de precio...
+      </div>
+    } @else if (columns().length === 0) {
+      <div class="text-sm text-gray-500 dark:text-gray-400">
+        No hay columnas de precio registradas todavía.
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100 dark:border-[#1f2937] text-xs text-gray-500 dark:text-gray-400">
+              <th class="py-[8px] px-[8px] text-left">Código</th>
+              <th class="py-[8px] px-[8px] text-left">Nombre</th>
+              <th class="py-[8px] px-[8px] text-left">Descripción</th>
+              <th class="py-[8px] px-[8px] text-center">Orden</th>
+              <th class="py-[8px] px-[8px] text-center">Activa</th>
+              <th class="py-[8px] px-[8px] text-center">Precio público</th>
+              <th class="py-[8px] px-[8px] text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (col of columns(); track col.id) {
+              <tr class="border-b border-gray-50 dark:border-[#111827] hover:bg-gray-50/60 dark:hover:bg-[#111827]">
+                <td class="py-[8px] px-[8px] align-top font-mono text-xs text-gray-800 dark:text-gray-100">
+                  {{ col.code }}
+                </td>
+                <td class="py-[8px] px-[8px] align-top text-sm text-black dark:text-white">
+                  {{ col.label }}
+                </td>
+                <td class="py-[8px] px-[8px] align-top text-xs text-gray-600 dark:text-gray-300">
+                  {{ col.description || '—' }}
+                </td>
+                <td class="py-[8px] px-[8px] align-top text-center text-xs text-gray-700 dark:text-gray-300">
+                  {{ col.visualOrder ?? 0 }}
+                </td>
+                <td class="py-[8px] px-[8px] align-top text-center">
+                  @if (col.active) {
+                    <span class="inline-flex items-center px-[8px] py-[2px] rounded-full bg-success-50 text-success-600 text-[11px]">
+                      Activa
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center px-[8px] py-[2px] rounded-full bg-gray-100 text-gray-600 text-[11px]">
+                      Inactiva
+                    </span>
+                  }
+                </td>
+                <td class="py-[8px] px-[8px] align-top text-center">
+                  @if (col.isPublicPrice) {
+                    <span class="inline-flex items-center px-[8px] py-[2px] rounded-full bg-primary-50 text-primary-600 text-[11px]">
+                      Público
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center px-[8px] py-[2px] rounded-full bg-gray-100 text-gray-600 text-[11px]">
+                      —
+                    </span>
+                  }
+                </td>
+                <td class="py-[8px] px-[8px] align-top text-right">
+                  @if (col.code.toLowerCase() === 'lista') {
+                    <span class="text-[11px] text-gray-400 dark:text-gray-500">Columna protegida</span>
+                  } @else {
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-[4px] text-xs text-primary-500 hover:text-primary-400 mr-[8px]"
+                      (click)="onEdit(col)"
+                    >
+                      <i class="material-symbols-outlined !text-[16px]">edit</i>
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-[4px] text-xs text-danger-500 hover:text-danger-400"
+                      (click)="onDelete(col)"
+                    >
+                      <i class="material-symbols-outlined !text-[16px]">delete</i>
+                      Eliminar
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+@if (showDeleteAssist()) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
+    <div class="bg-white dark:bg-[#0c1427] rounded-md p-[18px] md:p-[22px] max-w-3xl w-full mx-[16px]">
+      <h5 class="font-semibold text-black dark:text-white mb-[8px]">
+        Eliminar columna base
+      </h5>
+      <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300 mb-[10px]">
+        La columna
+        <span class="font-semibold">{{ deleteBaseColumn()?.label || deleteBaseColumn()?.code }}</span>
+        es columna base de otras columnas derivadas. Antes de eliminarla, indica qué deseas hacer con cada una de ellas:
+        definirlas como valor fijo o cambiar su columna base.
+      </p>
+
+      <div class="mt-[8px] max-h-[320px] overflow-y-auto space-y-[8px]">
+        @for (state of deleteDependentsState(); track state.columnId; let i = $index) {
+          <div class="border border-gray-200 dark:border-[#1f2937] rounded-md p-[10px]">
+            <div class="flex items-center justify-between gap-[10px]">
+              <div>
+                <div class="font-medium text-sm text-black dark:text-white">
+                  {{ state.label || state.code }}
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                  Código: {{ state.code }}
+                </div>
+              </div>
+            </div>
+            <div class="mt-[8px] grid md:grid-cols-2 gap-[10px]">
+              <div>
+                <label class="mb-[4px] text-xs text-gray-500 dark:text-gray-400 block">Acción</label>
+                <select
+                  class="h-[36px] rounded-md text-sm text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#111827] px-[10px] w-full"
+                  (change)="onChangeDeleteDependentAction(i, $any($event.target).value)"
+                >
+                  <option [selected]="state.action === 'fixed'" value="fixed">Definir como valor fijo</option>
+                  <option [selected]="state.action === 'changeBase'" value="changeBase">Cambiar columna base</option>
+                </select>
+              </div>
+              @if (state.action === 'changeBase') {
+                <div>
+                  <label class="mb-[4px] text-xs text-gray-500 dark:text-gray-400 block">Nueva columna base</label>
+                  <select
+                    class="h-[36px] rounded-md text-sm text-black dark:text-white border border-gray-200 dark:border-[#172036] bg-white dark:bg-[#111827] px-[10px] w-full"
+                    (change)="onChangeDeleteDependentBase(i, $any($event.target).value)"
+                  >
+                    <option value="">Selecciona columna base</option>
+                    @for (candidate of columns(); track candidate.id) {
+                      @if (
+                        candidate.id !== state.columnId &&
+                        candidate.code.toLowerCase() !== (deleteBaseColumn()?.code ?? '').toLowerCase()
+                      ) {
+                        <option
+                          [value]="candidate.code"
+                          [selected]="state.newBaseCode && state.newBaseCode === candidate.code"
+                        >
+                          {{ candidate.label || candidate.code }}
+                        </option>
+                      }
+                    }
+                  </select>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="mt-[14px] flex items-center justify-end gap-[10px]">
+        <button
+          type="button"
+          class="text-xs md:text-sm px-[14px] py-[6px] rounded-md border border-gray-300 dark:border-[#1f2937] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111827] hover:bg-gray-50 dark:hover:bg-[#1f2937]"
+          (click)="onCancelDeleteAssist()"
+          [disabled]="saving()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="text-xs md:text-sm px-[16px] py-[6px] rounded-md bg-danger-500 text-white hover:bg-danger-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="onConfirmDeleteAssist()"
+          [disabled]="saving()"
+        >
+          Confirmar cambios y eliminar columna base
+        </button>
+      </div>
+    </div>
+  </div>
+}
