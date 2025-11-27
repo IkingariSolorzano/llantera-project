@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 
@@ -30,8 +31,24 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Printf("warning: could not load .env file: %v", err)
+	// APP_ENV define el entorno actual: development, production, staging, etc.
+	// Según el valor se carga un archivo .env específico.
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		env = "development"
+	}
+
+	// Ejemplos de archivos:
+	//  - .env.development
+	//  - .env.production
+	//  - .env.staging
+	// Si el archivo específico no existe, se intenta cargar .env genérico.
+	envFile := ".env." + env
+	if err := godotenv.Load(envFile); err != nil {
+		log.Printf("warning: could not load %s file: %v", envFile, err)
+		if err := godotenv.Load(); err != nil {
+			log.Printf("warning: could not load .env file: %v", err)
+		}
 	}
 
 	cfg, err := config.Load()
