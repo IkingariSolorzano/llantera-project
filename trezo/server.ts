@@ -5,6 +5,10 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import bootstrap from './src/main.server';
 
+// Base href - se puede sobreescribir con variable de entorno
+// Valores: '/' para producción (llanteradeoccidente.com), '/llantera/' para staging (ikingarisolorzano.com/llantera)
+const BASE_HREF = process.env['BASE_HREF'] || '/';
+
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
     const server = express();
@@ -27,15 +31,22 @@ export function app(): express.Express {
 
     // All regular routes use the Angular engine
     server.get('**', (req, res, next) => {
-        const { protocol, originalUrl, baseUrl, headers } = req;
+        const { protocol, originalUrl, headers } = req;
+
+        // Reconstruir la URL completa incluyendo el BASE_HREF
+        // Nginx con trailing slash elimina el prefijo, así que lo agregamos de vuelta
+        const baseHrefPath = BASE_HREF.endsWith('/') ? BASE_HREF.slice(0, -1) : BASE_HREF;
+        const fullUrl = baseHrefPath === '' || originalUrl.startsWith(baseHrefPath)
+            ? `${protocol}://${headers.host}${originalUrl}`
+            : `${protocol}://${headers.host}${baseHrefPath}${originalUrl}`;
 
         commonEngine
         .render({
             bootstrap,
             documentFilePath: indexHtml,
-            url: `${protocol}://${headers.host}${originalUrl}`,
+            url: fullUrl,
             publicPath: browserDistFolder,
-            providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+            providers: [{ provide: APP_BASE_HREF, useValue: BASE_HREF }],
         })
         .then((html) => res.send(html))
         .catch((err) => next(err));

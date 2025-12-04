@@ -47,6 +47,61 @@
                     },
                     "configurations": {
                         "production": {
+                            "baseHref": "/",
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.production.ts"
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "5MB",
+                                    "maximumError": "10MB"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "1MB",
+                                    "maximumError": "2MB"
+                                }
+                            ],
+                            "outputHashing": "all",
+                            "allowedCommonJsDependencies": [
+                                "jspdf-autotable",
+                                "jspdf",
+                                "canvg",
+                                "html2canvas",
+                                "rgbcolor",
+                                "raf",
+                                "@babel/runtime/helpers/asyncToGenerator",
+                                "@babel/runtime/helpers/defineProperty",
+                                "@babel/runtime/helpers/typeof",
+                                "core-js/modules/es.promise.js",
+                                "core-js/modules/es.string.match.js",
+                                "core-js/modules/es.string.replace.js",
+                                "core-js/modules/es.string.starts-with.js",
+                                "core-js/modules/es.array.iterator.js",
+                                "core-js/modules/es.web.dom-collections.iterator.js",
+                                "core-js/modules/es.array.reduce.js",
+                                "core-js/modules/es.string.ends-with.js",
+                                "core-js/modules/es.string.split.js",
+                                "core-js/modules/es.string.trim.js",
+                                "core-js/modules/es.array.index-of.js",
+                                "core-js/modules/es.string.includes.js",
+                                "core-js/modules/es.array.reverse.js",
+                                "core-js/modules/es.regexp.to-string.js",
+                                "core-js"
+                            ]
+                        },
+                        "staging": {
+                            "baseHref": "/llantera/",
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.staging.ts"
+                                }
+                            ],
                             "budgets": [
                                 {
                                     "type": "initial",

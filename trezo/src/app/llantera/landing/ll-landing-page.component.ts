@@ -102,49 +102,49 @@ export class LlLandingPageComponent {
       name: 'Bridgestone Turanza ER300',
       description:
         'Llanta para automóvil con excelente rendimiento en mojado, gran durabilidad e ideal para uso diario y carretera.',
-      image: '/images/llantera/llantas/llanta1.jpg',
+      image: 'images/llantera/llantas/llanta1.jpg',
     },
     {
       id: 1,
       name: 'Michelin Defender',
       description:
         'Ideal para SUVs y camionetas, reconocida por su alta resistencia, confort y contribución al ahorro de combustible.',
-      image: '/images/llantera/llantas/llanta2.jpg',
+      image: 'images/llantera/llantas/llanta2.jpg',
     },
     {
       id: 2,
       name: 'Pirelli Cinturato P7',
       description:
         'Llanta de alto desempeño con agarre superior en carretera, bajo consumo de combustible y gran confort de manejo.',
-      image: '/images/llantera/llantas/llanta3.jpg',
+      image: 'images/llantera/llantas/llanta3.jpg',
     },
     {
       id: 3,
       name: 'Firestone Destination LE2',
       description:
         'Diseñada para camionetas y SUVs, ofrece tracción confiable en ciudad y carretera con excelente relación valor-precio.',
-      image: '/images/llantera/llantas/llanta4.jpg',
+      image: 'images/llantera/llantas/llanta4.jpg',
     },
     {
       id: 4,
       name: 'Goodyear Wrangler All-Terrain',
       description:
         'Llantas todo terreno para quienes combinan ciudad y caminos difíciles, con buena tracción y resistencia.',
-      image: '/images/llantera/llantas/llanta2.jpg',
+      image: 'images/llantera/llantas/llanta2.jpg',
     },
     {
       id: 5,
       name: 'Bridgestone Dueler H/T',
       description:
         'Llanta para camioneta orientada a autopista, con enfoque en confort, estabilidad y larga vida útil.',
-      image: '/images/llantera/llantas/llanta1.jpg',
+      image: 'images/llantera/llantas/llanta1.jpg',
     },
     {
       id: 6,
       name: 'Kit básico de emergencias',
       description:
         'Kit de parches, sellador y herramientas básicas para resolver pinchaduras y emergencias ligeras en el camino.',
-        image: '/images/llantera/llantas/llanta4.jpg'
+        image: 'images/llantera/llantas/llanta4.jpg'
     },
   ];
 

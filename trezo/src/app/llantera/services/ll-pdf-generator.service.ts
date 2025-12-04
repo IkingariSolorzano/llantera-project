@@ -37,7 +37,7 @@ export class LlPdfGeneratorService {
         this.logoLoaded = true;
       }
     };
-    img.src = '/images/llantera/Logo_Llantera de Occidente.png';
+    img.src = 'images/llantera/Logo_Llantera de Occidente.png';
   }
 
   /**
